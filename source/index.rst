@@ -1,10 +1,10 @@
-synApps
+epics-modules
 ============
 
 EPICS Support for beamline applications
 ---------------------------------------
 
-This page is the home of synApps, a collection of EPICS modules useful at beamlines and other applications.
+This page is the home of epics-modules, a collection of EPICS modules useful at synchrotron and neutron beamlines and other applications.
 
 Documentation created from release |release|
 
