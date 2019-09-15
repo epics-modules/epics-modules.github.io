@@ -34,6 +34,8 @@ Dante driver
 ------------
 Dante inherits from asynNDArrayDriver_.  It also implements the mca interface from the EPICS mca_ module.
 
+These are the additional records that the Dante driver provides.
+
 .. cssclass:: table-bordered table-striped table-hover
 .. list-table::
    :header-rows: 1
@@ -43,34 +45,24 @@ Dante inherits from asynNDArrayDriver_.  It also implements the mca interface fr
      - Record types
      - drvInfo string
      - Description
-   * - TimeStampMode, TimeStampMode_RBV
-     - bo, bi
-     - SP_TIME_STAMP_MODE
-     - Controls whether the TimeStamp attribute comes from the camera internal time stamp or from the EPICS time.
-       Choices are Camera (0), and EPICS (1).
-   * - UniqueIdMode, UniqueIdMode_RBV
-     - bo, bi
-     - SP_UNIQUE_ID_MODE
-     - Controls whether the UniqueId attribute comes from the camera internal value or from the driver.
-       Choices are Camera (0), and Driver (1).
-   * - ConvertPixelFormat, ConvertPixelFormat_RBV
+   * - CollectMode, CollectMode_RBV
      - mbbo, mbbi
-     - SP_CONVERT_PIXEL_FORMAT
-     - Controls conversion of the pixel format read from the camera to a different format.  For example this can be used
-       to convert Mono12Packed to Mono16, which allows the camera to send 12-bit data over the bus and then convert to 16-bit
-       on the host computer, reducing the required bandwidth and increasing the frame rate.
-   * - FailedPacketCount
+     - DanteCollectMode
+     - Controls the data collection mode.
+       Choices are "MCA" (0), "MCA Mapping" (1) and "List Mapping" (2).
+   * - CurrentPixel
      - longin
-     - SP_FAILED_PACKET_COUNT
-     - Failed packet count
-   * - FailedBufferCount
-     - longin
-     - SP_FAILED_BUFFER_COUNT
-     - Failed buffer count
-   * - BufferUnderrunCount
-     - longin
-     - SP_BUFFER_UNDERRUN_COUNT
-     - Buffer underrun count
+     - DanteCurrentPixel
+     - The current pixel number in mapping modes.
+   * - MaxEnergy, MaxEnergy_RBV
+     - ao, ai
+     - DanteMaxEnergy
+     - The actual energy of the last channel.  The user must provide this value based on the energy calibration.
+       It is used to provide meaningful units for the trigger thresholds, etc.
+   * - PollTime, PollTime_RBV
+     - ao, ai
+     - DantePollTime
+     - The time between polls when reading completion status from the driver.
 
 
 IOC startup script
