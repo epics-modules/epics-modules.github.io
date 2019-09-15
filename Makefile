@@ -17,10 +17,9 @@ all: sphinx
 sphinx:
 	$(SPHINX_MULTIBUILD) $(DOCS_PATHS) -i $(SOURCE) -s $(DOCS) -o $(BUILD)/html $(OPTS) -b html
 
-.PHONY: doxygen
-doxygen:
-	doxygen
-	cp -r doxy_output/html source/_extra/areaDetectorDoxygenHTML
+.PHONY: install
+install:
+	cp -r _build/html master/
 
 
 .PHONY: clean
