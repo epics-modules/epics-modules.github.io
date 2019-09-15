@@ -1,5 +1,5 @@
-areaDetector License
-====================
+License
+=======
 
 .. include:: ../../LICENSE
    :literal:
