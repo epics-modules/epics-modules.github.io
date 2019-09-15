@@ -4,6 +4,7 @@ master/_images/dante_mca.png
 master/_images/dante_trace.png
 master/_sources/dante/dante.rst.txt
 master/_sources/index.rst.txt
+master/_sources/ip330/ip330.rst.txt
 master/_sources/measComp/measComp.rst.txt
 master/_sources/modules.rst.txt
 master/_sources/readme.rst.txt
@@ -99,6 +100,7 @@ master/_static/websupport.js
 master/dante/dante.html
 master/genindex.html
 master/index.html
+master/ip330/ip330.html
 master/measComp/measComp.html
 master/modules.html
 master/objects.inv

@@ -6,3 +6,4 @@ synApps modules
 
     dante/dante
     measComp/measComp
+    ip330/ip330
