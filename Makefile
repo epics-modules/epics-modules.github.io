@@ -26,3 +26,4 @@ install:
 clean:
 	rm -rf _docs
 	rm -rf _build
+	rm -rf master/html
