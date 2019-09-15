@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Dante &#8212; areaDetector 57814cb documentation</title>
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
+    <link rel="shortcut icon" href="../_static/favicon_t.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="measComp" href="../measComp/measComp.html" />
+    <link rel="prev" title="synApps modules" href="../modules.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html">
+          areaDetector</a>
+        <span class="navbar-text navbar-version pull-left"><b>57814cb</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../readme.html">Readme</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../modules.html">synApps modules</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Dante</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dante-driver">Dante driver</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ioc-startup-script">IOC startup script</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#medm-screens">MEDM screens</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../measComp/measComp.html">measComp</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../measComp/measComp.html#introduction">Introduction</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../doxygen.html">Source Code Documentation</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">Dante</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#dante-driver">Dante driver</a></li>
+<li><a class="reference internal" href="#ioc-startup-script">IOC startup script</a></li>
+<li><a class="reference internal" href="#medm-screens">MEDM screens</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+  <li>
+    <a href="../modules.html" title="Previous Chapter: synApps modules"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; synApps modules</span>
+    </a>
+  </li>
+  <li>
+    <a href="../measComp/measComp.html" title="Next Chapter: measComp"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">measComp &raquo;</span>
+    </a>
+  </li>
+              
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="../_sources/dante/dante.rst.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <div class="section" id="dante">
+<h1><a class="toc-backref" href="#id2">Dante</a><a class="headerlink" href="#dante" title="Permalink to this headline">¶</a></h1>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">author:</th><td class="field-body">Mark Rivers, University of Chicago</td>
+</tr>
+</tbody>
+</table>
+<div class="contents topic" id="contents">
+<p class="topic-title first">Contents</p>
+<ul class="simple">
+<li><a class="reference internal" href="#dante" id="id2">Dante</a><ul>
+<li><a class="reference internal" href="#overview" id="id3">Overview</a></li>
+<li><a class="reference internal" href="#dante-driver" id="id4">Dante driver</a></li>
+<li><a class="reference internal" href="#ioc-startup-script" id="id5">IOC startup script</a></li>
+<li><a class="reference internal" href="#medm-screens" id="id6">MEDM screens</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="overview">
+<h2><a class="toc-backref" href="#id3">Overview</a><a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>This is an EPICS driver for the <a class="reference external" href="https://www.xglab.it">XGLab</a> Dante digital x-ray spectroscopy system.
+The Dante is available in single channel and 8-channel versions
+This module is intended to work with either, though it has currently only been tested on the single-channel version.</p>
+<p>The Dante can collect data in 3 different modes:</p>
+<ul class="simple">
+<li>Single MCA spectrum.  It acquires a single MCA spectrum on all channels.</li>
+<li>MCA mapping mode.  It acquires multiple spectra in rapid succession, and it often used for making an x-ray map where there is an MCA
+spectrum for each channel at each pixel.  The advance to the next pixel can come from an internal clock or an external trigger.</li>
+<li>List mapping mode.  It acquires each x-ray event energy and timestamp in a list buffer.</li>
+</ul>
+<p>The dante driver is derived from the base class <a class="reference external" href="https://areadetector.github.io/master/ADCore/NDArray.html#asynndarraydriver">asynNDArrayDriver</a>, which is part of the EPICS areaDetector package.
+The allows the dante driver to use all of the areaDetector plugins for file saving in mapping mode and other purposes.</p>
+</div>
+<div class="section" id="dante-driver">
+<h2><a class="toc-backref" href="#id4">Dante driver</a><a class="headerlink" href="#dante-driver" title="Permalink to this headline">¶</a></h2>
+<p>Dante inherits from <a class="reference external" href="https://areadetector.github.io/master/ADCore/NDArray.html#asynndarraydriver">asynNDArrayDriver</a>.  It also implements the mca interface from the EPICS <a class="reference external" href="https://github.com/epics-modules/mca">mca</a> module.</p>
+<table border="1" class="colwidths-auto table-bordered table-striped table-hover docutils">
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">EPICS record names</th>
+<th class="head">Record types</th>
+<th class="head">drvInfo string</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>TimeStampMode, TimeStampMode_RBV</td>
+<td>bo, bi</td>
+<td>SP_TIME_STAMP_MODE</td>
+<td>Controls whether the TimeStamp attribute comes from the camera internal time stamp or from the EPICS time.
+Choices are Camera (0), and EPICS (1).</td>
+</tr>
+<tr class="row-odd"><td>UniqueIdMode, UniqueIdMode_RBV</td>
+<td>bo, bi</td>
+<td>SP_UNIQUE_ID_MODE</td>
+<td>Controls whether the UniqueId attribute comes from the camera internal value or from the driver.
+Choices are Camera (0), and Driver (1).</td>
+</tr>
+<tr class="row-even"><td>ConvertPixelFormat, ConvertPixelFormat_RBV</td>
+<td>mbbo, mbbi</td>
+<td>SP_CONVERT_PIXEL_FORMAT</td>
+<td>Controls conversion of the pixel format read from the camera to a different format.  For example this can be used
+to convert Mono12Packed to Mono16, which allows the camera to send 12-bit data over the bus and then convert to 16-bit
+on the host computer, reducing the required bandwidth and increasing the frame rate.</td>
+</tr>
+<tr class="row-odd"><td>FailedPacketCount</td>
+<td>longin</td>
+<td>SP_FAILED_PACKET_COUNT</td>
+<td>Failed packet count</td>
+</tr>
+<tr class="row-even"><td>FailedBufferCount</td>
+<td>longin</td>
+<td>SP_FAILED_BUFFER_COUNT</td>
+<td>Failed buffer count</td>
+</tr>
+<tr class="row-odd"><td>BufferUnderrunCount</td>
+<td>longin</td>
+<td>SP_BUFFER_UNDERRUN_COUNT</td>
+<td>Buffer underrun count</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="ioc-startup-script">
+<h2><a class="toc-backref" href="#id5">IOC startup script</a><a class="headerlink" href="#ioc-startup-script" title="Permalink to this headline">¶</a></h2>
+<p>The command to configure an ADSpinnaker camera in the startup script is:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>ADSpinnakerConfig(const char *portName, const char *cameraId, int traceMask, int memoryChannel,
+                  size_t maxMemory, int priority, int stackSize)
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">portName</span></code> is the name for the ADSpinnaker port driver</p>
+<p><code class="docutils literal notranslate"><span class="pre">cameraId</span></code> is the either the serial number of the camera or the camera index number in the system.  The serial number is normally printed
+on the camera, and it is also the last part of the camera name returned by arv-tool, for example for
+<code class="docutils literal notranslate"><span class="pre">&quot;Point</span> <span class="pre">Grey</span> <span class="pre">Research-Blackfly</span> <span class="pre">S</span> <span class="pre">BFS-PGE-50S5C-18585624&quot;</span></code>, it would be 18585624.
+If cameraId is less than 1000 it is assumed to be the system index number, if 1000 or greater it is assumed to be a serial number.</p>
+<p><code class="docutils literal notranslate"><span class="pre">traceMask</span></code> is the initial value of asynTraceMask to be used for debugging problems in the constructor.</p>
+<p><code class="docutils literal notranslate"><span class="pre">memoryChannel</span></code> is the internal channel number in the camera to be used for saved cameras settings.</p>
+<p><code class="docutils literal notranslate"><span class="pre">maxMemory</span></code> is the maximum amount of memory the NDArrayPool is allowed to allocate.  0 means unlimited.</p>
+<p><code class="docutils literal notranslate"><span class="pre">priority</span></code> is the priority of the port thread.  0 means medium priority.</p>
+<p><code class="docutils literal notranslate"><span class="pre">stackSize</span></code> is the stack size.  0 means medium size.</p>
+</div>
+<div class="section" id="medm-screens">
+<h2><a class="toc-backref" href="#id6">MEDM screens</a><a class="headerlink" href="#medm-screens" title="Permalink to this headline">¶</a></h2>
+<p>The following is the main MEDM screen dante.adl.</p>
+<div class="figure align-center">
+<img alt="../_images/dante.png" src="../_images/dante.png" />
+</div>
+<p>The following is the MEDM screen mca.adl displaying the mca spectrum as it is acquiring.</p>
+<div class="figure align-center">
+<img alt="../_images/dante_mca.png" src="../_images/dante_mca.png" />
+</div>
+<p>The following is the MEDM screen danteTrace.adl displaying the ADC trace. One reset is visible on this trace.</p>
+<div class="figure align-center">
+<img alt="../_images/dante_trace.png" src="../_images/dante_trace.png" />
+</div>
+<p>The following is the MEDM screen NDFileHDF5.adl when the Dante is saving MCA mapping data to an HDF5 file.</p>
+<div class="figure align-center">
+<img alt="../_images/dante_mapping_hdf5.png" src="../_images/dante_mapping_hdf5.png" />
+</div>
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2019, Mark Rivers.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>
