@@ -19,7 +19,7 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'areaDetector'
+project = 'EPICS Modules'
 copyright = '2019, Mark Rivers'
 author = 'Mark Rivers'
 
@@ -79,10 +79,10 @@ highlight_language = 'none'
 
 # Breathe configuration
 import os
-breathe_projects = { "areaDetector":
+breathe_projects = { "epics-modules":
                         os.path.abspath('../doxy_output/xml') }
 
-breathe_default_project = "areaDetector"
+breathe_default_project = "epics-modules"
 breathe_default_members = ('members', 'undoc-members')
 
 source_encoding = 'utf-8-sig'
@@ -103,7 +103,7 @@ html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
 # html_theme_options = {}
 html_theme_options = {
     # Navigation bar title. (Default: ``project`` value)
-    'navbar_title': "areaDetector",
+    'navbar_title': "epics-modules",
 
     # Tab name for entire site. (Default: "Site")
     'navbar_site_name': "Site",
@@ -187,7 +187,7 @@ html_favicon = 'favicon_t.ico'
 # -- Options for HTMLHelp output ---------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'areaDetectordoc'
+htmlhelp_basename = 'epics-modulesdoc'
 
 
 # -- Options for LaTeX output ------------------------------------------------
@@ -214,7 +214,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'areaDetector.tex', 'areaDetector Documentation',
+    (master_doc, 'epics-modules.tex', 'EPICS Modules Documentation',
      'Mark Rivers', 'manual'),
 ]
 
@@ -224,7 +224,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'areadetector', 'areaDetector Documentation',
+    (master_doc, 'epics-modules', 'EPICS Modules Documentation',
      [author], 1)
 ]
 
@@ -235,8 +235,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'areaDetector', 'areaDetector Documentation',
-     author, 'areaDetector', 'One line description of project.',
+    (master_doc, 'epics-modules', 'EPICS Modules Documentation',
+     author, 'epics-modules', 'One line description of project.',
      'Miscellaneous'),
 ]
 
