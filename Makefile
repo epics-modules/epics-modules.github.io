@@ -10,7 +10,7 @@ SOURCE = source
 OPTS =
 
 .PHONY: all
-all: sphinx
+all: sphinx install
 
 
 .PHONY: all
