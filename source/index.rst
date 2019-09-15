@@ -15,6 +15,7 @@ Contents
    :maxdepth: 1
 
    Readme <readme>
+   License <https://www.aps.anl.gov/BCDA/synApps-license>
    synApps modules <modules>
-   Source Code Documentation <doxygen>
+
 
