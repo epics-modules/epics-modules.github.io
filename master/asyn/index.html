@@ -1,16 +1,829 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
-<head>
-  <title>asyn</title>
-  <meta content="text/html; charset=ISO-8859-1" http-equiv="Content-Type" />
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!-- saved from url=(0040)https://epics.anl.gov/modules/soft/asyn/ -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+  <meta http-equiv="Content-Type" content="text/html">
+  <title>asynDriver</title>
 </head>
+
 <body>
-  <h1>
-    asyn</h1>
-  <p>
-    Module Owner: Mark Rivers: University of Chicago</p>
-  <p>
-    This page is the home of <b>asyn</b>.</p>
-</body>
-</html>
+<img src="./asynDriver_files/logo101.gif" align="right" width="101" height="101" alt="EPICS">
+
+<h2 align="center">asynDriver: Asynchronous Driver Support</h2>
+
+<dl>
+<dt>Module Owner:</dt>
+<dd><a href="mailto:rivers@cars.uchicago.edu">Mark Rivers</a></dd>
+<dt>Code Repository:</dt>
+<dd><a href="https://github.com/epics-modules/asyn">github.com/epics-modules/asyn</a></dd>
+</dl>
+
+<h3>Description</h3>
+
+<p>asynDriver (also called Asyn) is a general purpose facility for interfacing
+device specific code to low level communication drivers.</p>
+
+<p>A primary target for asynDriver is for EPICS IOC device support, but other
+than using the EPICS build system and libCom library, most of the code was
+designed so it can be used outside of an EPICS IOC.</p>
+
+<p>If you're new to EPICS Serial I/O, the <b>How-to Guide for Stream Device</b>
+released in Asyn 4-21 and later is an introduction to using Dirk Zimoch's
+<a href="http://epics.web.psi.ch/software/streamdevice/doc/">StreamDevice
+module</a> and is the currently recommended way to implement reasonably complex
+serial communications protocols (the synApps
+<a href="https://github.com/epics-modules/stream">stream wrapper module</a> is
+also recommended). See the Documentation column in the table below for links to
+updated versions of this How-to document in each Asyn release.</p>
+
+<p>If you're just getting starting with Asyn, our
+<a href="https://epics.anl.gov/modules/soft/asyn/AsynRecordControl/AsynRecordControl.html">How-to Guide for the Asyn
+Record</a> gives a step-by-step example of how to communicate with a
+message-based instrument using just an ASYN record.</p>
+
+<p>Please email comments and bug reports to tech-talk, or to
+<a href="mailto:rivers@cars.uchicago.edu">Mark Rivers</a> who is responsible for
+coordinating development and releases.</p>
+
+<h3>Installation and Building</h3>
+
+<p>EPICS base must already be built.  After Asyn is downloaded and the files
+extracted:</p>
+
+<blockquote>
+  <pre>cd configure
+vi RELEASE  <i>Define the path for EPICS_BASE and optionally IPAC</i>
+cd ..
+make</pre>
+</blockquote>
+
+<h3>Modules Required</h3>
+
+<p>asynDriver provides a driver for the GreenSprings Industry Pack IP488 module
+and the octalUART. If these are to be used then
+<a href="https://github.com/epics-modules/ipac/wiki">IPAC support</a> is required
+to build asynDriver. The asynDriver configure/RELEASE file has a comment about
+how to include IPAC support.</p>
+
+<h3>Related Modules</h3>
+
+<p><a href="http://epics.web.psi.ch/software/streamdevice/">StreamDevice</a>,
+a generic EPICS device support driver for devices with a "byte stream"
+based communication interface, comes with an interface to asynDriver. For most
+users the synApps <a href="https://github.com/epics-modules/stream">stream
+wrapper module</a> may be more useful than the PSI original, which must be
+checked out into an existing EPICS support module.</p>
+
+<h3>Releases</h3>
+
+<p>You can download the software from the links in the table below:</p>
+
+<table border="1">
+  <tbody>
+    <tr>
+      <th>Module Version</th>
+      <th>EPICS Release</th>
+      <th>Filename</th>
+      <th>Documentation</th>
+      <th>Release Notes</th>
+      <th>Known Problems</th>
+    </tr>
+    <tr>
+      <td>R4-38</td>
+      <td>Base-3.14.12.2 or later.<br>
+        Use Base-3.16.1 or EPICS 7<br>
+        for Int64 record support.</td>
+      <td><a href="https://epics.anl.gov/download/modules/asyn4-38.tar.gz">asyn4-38.tar.gz</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-38/asynDriver.html">asynDriver</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-38/asynDriver.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-38/devGpib.html">devGpib</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-38/devGpib.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-38/asynRecord.html">asynRecord</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-38/asynRecord.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-38/AsynTimeStampSupport.pdf">TimeStamp Support (PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-38/asynDoxygenHTML/index.html">Doxygen</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-38/HowToDoSerial/HowToDoSerial_StreamDevice.html">HowTo-StreamDevice</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-38/gpibCoreConversion/conversionNotes.html">gpibCoreConversion</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-38/RELEASE_NOTES.html">Release Notes</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-38/KnownProblems.html">Known Problems</a></td>
+    </tr>
+    <tr>
+      <td>R4-37</td>
+      <td>Base-3.14.12.2 or later.<br>
+        Use Base-3.16.1 or EPICS 7<br>
+        for Int64 record support.</td>
+      <td><a href="https://epics.anl.gov/download/modules/asyn4-37.tar.gz">asyn4-37.tar.gz</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-37/asynDriver.html">asynDriver</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-37/asynDriver.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-37/devGpib.html">devGpib</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-37/devGpib.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-37/asynRecord.html">asynRecord</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-37/asynRecord.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-37/AsynTimeStampSupport.pdf">TimeStamp Support (PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-37/asynDoxygenHTML/index.html">Doxygen</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-37/HowToDoSerial/HowToDoSerial_StreamDevice.html">HowTo-StreamDevice</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-37/gpibCoreConversion/conversionNotes.html">gpibCoreConversion</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-37/RELEASE_NOTES.html">Release Notes</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-37/KnownProblems.html">Known Problems</a></td>
+    </tr>
+    <tr>
+      <td>R4-36</td>
+      <td>3.14.12.2 or later</td>
+      <td><a href="https://epics.anl.gov/download/modules/asyn4-36.tar.gz">asyn4-36.tar.gz</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-36/asynDriver.html">asynDriver</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-36/asynDriver.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-36/devGpib.html">devGpib</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-36/devGpib.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-36/asynRecord.html">asynRecord</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-36/asynRecord.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-36/AsynTimeStampSupport.pdf">TimeStamp Support (PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-36/asynDoxygenHTML/index.html">Doxygen</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-36/HowToDoSerial/HowToDoSerial_StreamDevice.html">HowTo-StreamDevice</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-36/gpibCoreConversion/conversionNotes.html">gpibCoreConversion</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-36/RELEASE_NOTES.html">Release Notes</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-36/KnownProblems.html">Known Problems</a></td>
+    </tr>
+    <tr>
+      <td>R4-35</td>
+      <td>3.14.12.2 or later</td>
+      <td><a href="https://epics.anl.gov/download/modules/asyn4-35.tar.gz">asyn4-35.tar.gz</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-35/asynDriver.html">asynDriver</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-35/asynDriver.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-35/devGpib.html">devGpib</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-35/devGpib.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-35/asynRecord.html">asynRecord</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-35/asynRecord.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-35/AsynTimeStampSupport.pdf">TimeStamp Support (PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-35/asynDoxygenHTML/index.html">Doxygen</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-35/HowToDoSerial/HowToDoSerial_StreamDevice.html">HowTo-StreamDevice</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-35/gpibCoreConversion/conversionNotes.html">gpibCoreConversion</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-35/RELEASE_NOTES.html">Release Notes</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-35/KnownProblems.html">Known Problems</a></td>
+    </tr>
+    <tr>
+      <td>R4-34</td>
+      <td>3.14.12.2 or later</td>
+      <td><a href="https://epics.anl.gov/download/modules/asyn4-34.tar.gz">asyn4-34.tar.gz</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-34/asynDriver.html">asynDriver</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-34/asynDriver.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-34/devGpib.html">devGpib</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-34/devGpib.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-34/asynRecord.html">asynRecord</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-34/asynRecord.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-34/AsynTimeStampSupport.pdf">TimeStamp Support (PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-34/asynDoxygenHTML/index.html">Doxygen</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-34/HowToDoSerial/HowToDoSerial_StreamDevice.html">HowTo-StreamDevice</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-34/gpibCoreConversion/conversionNotes.html">gpibCoreConversion</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-34/RELEASE_NOTES.html">Release Notes</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-34/KnownProblems.html">Known Problems</a></td>
+    </tr>
+    <tr>
+      <td>R4-33</td>
+      <td>3.14.12.2 or later</td>
+      <td><a href="https://epics.anl.gov/download/modules/asyn4-33.tar.gz">asyn4-33.tar.gz</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-33/asynDriver.html">asynDriver</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-33/asynDriver.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-33/devGpib.html">devGpib</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-33/devGpib.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-33/asynRecord.html">asynRecord</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-33/asynRecord.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-33/AsynTimeStampSupport.pdf">TimeStamp Support (PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-33/asynDoxygenHTML/index.html">Doxygen</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-33/HowToDoSerial/HowToDoSerial_StreamDevice.html">HowTo-StreamDevice</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-33/gpibCoreConversion/conversionNotes.html">gpibCoreConversion</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-33/RELEASE_NOTES.html">Release Notes</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-33/KnownProblems.html">Known Problems</a></td>
+    </tr>
+    <tr>
+      <td>R4-32</td>
+      <td>3.14.12.2 or later</td>
+      <td><a href="https://epics.anl.gov/download/modules/asyn4-32.tar.gz">asyn4-32.tar.gz</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-32/asynDriver.html">asynDriver</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-32/asynDriver.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-32/devGpib.html">devGpib</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-32/devGpib.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-32/asynRecord.html">asynRecord</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-32/asynRecord.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-32/AsynTimeStampSupport.pdf">TimeStamp Support (PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-32/asynDoxygenHTML/index.html">Doxygen</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-32/HowToDoSerial/HowToDoSerial_StreamDevice.html">HowTo-StreamDevice</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-32/gpibCoreConversion/conversionNotes.html">gpibCoreConversion</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-32/RELEASE_NOTES.html">Release Notes</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-32/KnownProblems.html">Known Problems</a></td>
+    </tr>
+    <tr>
+      <td>R4-31</td>
+      <td>3.14.12.2 or later</td>
+      <td><a href="https://epics.anl.gov/download/modules/asyn4-31.tar.gz">asyn4-31.tar.gz</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-31/asynDriver.html">asynDriver</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-31/asynDriver.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-31/devGpib.html">devGpib</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-31/devGpib.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-31/asynRecord.html">asynRecord</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-31/asynRecord.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-31/AsynTimeStampSupport.pdf">TimeStamp Support (PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-31/asynDoxygenHTML/index.html">Doxygen</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-31/HowToDoSerial/HowToDoSerial_StreamDevice.html">HowTo-StreamDevice</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-31/gpibCoreConversion/conversionNotes.html">gpibCoreConversion</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-31/RELEASE_NOTES.html">Release Notes</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-31/KnownProblems.html">Known Problems</a></td>
+    </tr>
+    <tr>
+      <td>R4-30</td>
+      <td>3.14.12.2 or later</td>
+      <td><a href="https://epics.anl.gov/download/modules/asyn4-30.tar.gz">asyn4-30.tar.gz</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-30/asynDriver.html">asynDriver</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-30/asynDriver.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-30/devGpib.html">devGpib</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-30/devGpib.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-30/asynRecord.html">asynRecord</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-30/asynRecord.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-30/AsynTimeStampSupport.pdf">TimeStamp Support (PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-30/asynDoxygenHTML/index.html">Doxygen</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-30/HowToDoSerial/HowToDoSerial_StreamDevice.html">HowTo-StreamDevice</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-30/gpibCoreConversion/conversionNotes.html">gpibCoreConversion</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-30/gpibCoreConversion/conversionNotes.pdf">(PDF)</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-30/RELEASE_NOTES.html">Release Notes</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-30/KnownProblems.html">Known Problems</a></td>
+    </tr>
+    <tr>
+      <td>R4-29</td>
+      <td>3.14.12.2 or later</td>
+      <td><a href="https://epics.anl.gov/download/modules/asyn4-29.tar.gz">asyn4-29.tar.gz</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-29/asynDriver.html">asynDriver</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-29/asynDriver.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-29/devGpib.html">devGpib</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-29/devGpib.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-29/asynRecord.html">asynRecord</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-29/asynRecord.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-29/AsynTimeStampSupport.pdf">TimeStamp Support (PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-29/asynDoxygenHTML/index.html">Doxygen</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-29/HowToDoSerial/HowToDoSerial_StreamDevice.html">HowTo-StreamDevice</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-29/gpibCoreConversion/conversionNotes.html">gpibCoreConversion</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-29/gpibCoreConversion/conversionNotes.pdf">(PDF)</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-29/RELEASE_NOTES.html">Release Notes</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-29/KnownProblems.html">Known Problems</a></td>
+    </tr>
+    <tr>
+      <td>R4-28</td>
+      <td>3.14.12.2 or later</td>
+      <td><a href="https://epics.anl.gov/download/modules/asyn4-28.tar.gz">asyn4-28.tar.gz</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-28/asynDriver.html">asynDriver</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-28/asynDriver.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-28/devGpib.html">devGpib</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-28/devGpib.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-28/asynRecord.html">asynRecord</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-28/asynRecord.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-28/AsynTimeStampSupport.pdf">TimeStamp Support (PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-28/asynDoxygenHTML/index.html">Doxygen</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-28/HowToDoSerial/HowToDoSerial_StreamDevice.html">HowTo-StreamDevice</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-28/gpibCoreConversion/conversionNotes.html">gpibCoreConversion</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-28/gpibCoreConversion/conversionNotes.pdf">(PDF)</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-28/RELEASE_NOTES.html">Release Notes</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-28/KnownProblems.html">Known Problems</a></td>
+    </tr>
+    <tr>
+      <td>R4-27</td>
+      <td>3.14.12.2 or later</td>
+      <td><a href="https://epics.anl.gov/download/modules/asyn4-27.tar.gz">asyn4-27.tar.gz</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-27/asynDriver.html">asynDriver</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-27/asynDriver.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-27/devGpib.html">devGpib</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-27/devGpib.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-27/asynRecord.html">asynRecord</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-27/asynRecord.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-27/AsynTimeStampSupport.pdf">TimeStamp Support (PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-27/asynDoxygenHTML/index.html">Doxygen</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-27/HowToDoSerial/HowToDoSerial_StreamDevice.html">HowTo-StreamDevice</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-27/gpibCoreConversion/conversionNotes.html">gpibCoreConversion</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-27/gpibCoreConversion/conversionNotes.pdf">(PDF)</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-27/RELEASE_NOTES.html">Release Notes</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-27/KnownProblems.html">Known Problems</a></td>
+    </tr>
+    <tr>
+      <td>R4-26</td>
+      <td>3.14.12.2 or later</td>
+      <td><a href="https://epics.anl.gov/download/modules/asyn4-26.tar.gz">asyn4-26.tar.gz</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-26/asynDriver.html">asynDriver</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-26/asynDriver.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-26/devGpib.html">devGpib</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-26/devGpib.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-26/asynRecord.html">asynRecord</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-26/asynRecord.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-26/AsynTimeStampSupport.pdf">TimeStamp Support (PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-26/asynDoxygenHTML/index.html">Doxygen</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-26/HowToDoSerial/HowToDoSerial_StreamDevice.html">HowTo-StreamDevice</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-26/gpibCoreConversion/conversionNotes.html">gpibCoreConversion</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-26/gpibCoreConversion/conversionNotes.pdf">(PDF)</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-26/RELEASE_NOTES.html">Release Notes</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-26/KnownProblems.html">Known Problems</a></td>
+    </tr>
+    <tr>
+      <td>R4-25</td>
+      <td>3.14.12.2 or later</td>
+      <td><a href="https://epics.anl.gov/download/modules/asyn4-25.tar.gz">asyn4-25.tar.gz</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-25/asynDriver.html">asynDriver</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-25/asynDriver.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-25/devGpib.html">devGpib</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-25/devGpib.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-25/asynRecord.html">asynRecord</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-25/asynRecord.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-25/AsynTimeStampSupport.pdf">TimeStamp Support (PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-25/asynDoxygenHTML/index.html">Doxygen</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-25/HowToDoSerial/HowToDoSerial_StreamDevice.html">HowTo-StreamDevice</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-25/gpibCoreConversion/conversionNotes.html">gpibCoreConversion</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-25/gpibCoreConversion/conversionNotes.pdf">(PDF)</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-25/RELEASE_NOTES.html">Release Notes</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-25/KnownProblems.html">Known Problems</a></td>
+    </tr>
+    <tr>
+      <td>R4-24</td>
+      <td>3.14.12.2 or later</td>
+      <td><a href="https://epics.anl.gov/download/modules/asyn4-24.tar.gz">asyn4-24.tar.gz</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-24/asynDriver.html">asynDriver</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-24/asynDriver.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-24/devGpib.html">devGpib</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-24/devGpib.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-24/asynRecord.html">asynRecord</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-24/asynRecord.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-24/AsynTimeStampSupport.pdf">TimeStamp Support (PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-24/asynDoxygenHTML/index.html">Doxygen</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-24/HowToDoSerial/HowToDoSerial_StreamDevice.html">HowTo-StreamDevice</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-24/gpibCoreConversion/conversionNotes.html">gpibCoreConversion</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-24/gpibCoreConversion/conversionNotes.pdf">(PDF)</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-24/RELEASE_NOTES.html">Release Notes</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-24/KnownProblems.html">Known Problems</a></td>
+    </tr>
+    <tr>
+      <td>R4-23</td>
+      <td>3.14.12.2 or later</td>
+      <td><a href="https://epics.anl.gov/download/modules/asyn4-23.tar.gz">asyn4-23.tar.gz</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-23/asynDriver.html">asynDriver</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-23/asynDriver.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-23/devGpib.html">devGpib</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-23/devGpib.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-23/asynRecord.html">asynRecord</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-23/asynRecord.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-23/asynDoxygenHTML/index.html">Doxygen</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-23/HowToDoSerial/HowToDoSerial_StreamDevice.html">HowTo-StreamDevice</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-23/gpibCoreConversion/conversionNotes.html">gpibCoreConversion</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-23/gpibCoreConversion/conversionNotes.pdf">(PDF)</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-23/RELEASE_NOTES.html">Release Notes</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-23/KnownProblems.html">Known Problems</a></td>
+    </tr>
+    <tr>
+      <td>R4-22</td>
+      <td>3.14.12.2 or later</td>
+      <td><a href="https://epics.anl.gov/download/modules/asyn4-22.tar.gz">asyn4-22.tar.gz</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-22/asynDriver.html">asynDriver</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-22/asynDriver.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-22/devGpib.html">devGpib</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-22/devGpib.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-22/asynRecord.html">asynRecord</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-22/asynRecord.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-22/asynDoxygenHTML/index.html">Doxygen</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-22/HowToDoSerial/HowToDoSerial_StreamDevice.html">HowTo-StreamDevice</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-22/gpibCoreConversion/conversionNotes.html">gpibCoreConversion</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-22/gpibCoreConversion/conversionNotes.pdf">(PDF)</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-22/RELEASE_NOTES.html">Release Notes</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-22/KnownProblems.html">Known Problems</a></td>
+    </tr>
+    <tr>
+      <td>R4-21</td>
+      <td>3.14.12.2 or later</td>
+      <td><a href="https://epics.anl.gov/download/modules/asyn4-21.tar.gz">asyn4-21.tar.gz</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-21/asynDriver.html">asynDriver</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-21/asynDriver.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-21/devGpib.html">devGpib</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-21/devGpib.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-21/asynRecord.html">asynRecord</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-21/asynRecord.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-21/asynDoxygenHTML/index.html">Doxygen</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-21/HowToDoSerial/HowToDoSerial_StreamDevice.html">HowTo-StreamDevice</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-21/gpibCoreConversion/conversionNotes.html">gpibCoreConversion</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-21/gpibCoreConversion/conversionNotes.pdf">(PDF)</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-21/RELEASE_NOTES.html">Release Notes</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-21/KnownProblems.html">Known Problems</a></td>
+    </tr>
+    <tr>
+      <td>R4-20</td>
+      <td>3.14.12.2 or later</td>
+      <td><a href="https://epics.anl.gov/download/modules/asyn4-20.tar.gz">asyn4-20.tar.gz</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-20/asynDriver.html">asynDriver</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-20/asynDriver.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-20/devGpib.html">devGpib</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-20/devGpib.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-20/asynRecord.html">asynRecord</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-20/asynRecord.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-20/asynDoxygenHTML/index.html">Doxygen</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-20/HowToDoSerial/tutorial.pdf">HowToDoSerial (PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-20/gpibCoreConversion/conversionNotes.html">gpibCoreConversion</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-20/gpibCoreConversion/conversionNotes.pdf">(PDF)</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-20/RELEASE_NOTES.html">Release Notes</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-20/KnownProblems.html">Known Problems</a></td>
+    </tr>
+    <tr>
+      <td>R4-19</td>
+      <td>3.14.11 or later</td>
+      <td><a href="https://epics.anl.gov/download/modules/asyn4-19.tar.gz">asyn4-19.tar.gz</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-19/asynDriver.html">asynDriver</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-19/asynDriver.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-19/devGpib.html">devGpib</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-19/devGpib.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-19/asynRecord.html">asynRecord</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-19/asynRecord.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-19/asynDoxygenHTML/index.html">Doxygen</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-19/HowToDoSerial/tutorial.pdf">HowToDoSerial (PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-19/gpibCoreConversion/conversionNotes.html">gpibCoreConversion</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-19/gpibCoreConversion/conversionNotes.pdf">(PDF)</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-19/RELEASE_NOTES.html">Release Notes</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-19/KnownProblems.html">Known Problems</a></td>
+    </tr>
+    <tr>
+      <td>R4-18</td>
+      <td>3.14.11 or later</td>
+      <td><a href="https://epics.anl.gov/download/modules/asyn4-18.tar.gz">asyn4-18.tar.gz</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-18/asynDriver.html">asynDriver</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-18/asynDriver.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-18/devGpib.html">devGpib</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-18/devGpib.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-18/asynRecord.html">asynRecord</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-18/asynRecord.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-18/asynDoxygenHTML/index.html">Doxygen</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-18/HowToDoSerial/tutorial.pdf">HowToDoSerial (PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-18/gpibCoreConversion/conversionNotes.html">gpibCoreConversion</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-18/gpibCoreConversion/conversionNotes.pdf">(PDF)</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-18/RELEASE_NOTES.html">Release Notes</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-18/KnownProblems.html">Known Problems</a></td>
+    </tr>
+    <tr>
+      <td>R4-17</td>
+      <td>3.14.11 or later</td>
+      <td><a href="https://epics.anl.gov/download/modules/asyn4-17.tar.gz">asyn4-17.tar.gz</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-17/asynDriver.html">asynDriver</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-17/asynDriver.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-17/devGpib.html">devGpib</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-17/devGpib.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-17/asynRecord.html">asynRecord</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-17/asynRecord.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-17/asynDoxygenHTML/index.html">Doxygen</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-17/HowToDoSerial/tutorial.pdf">HowToDoSerial (PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-17/gpibCoreConversion/conversionNotes.html">gpibCoreConversion</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-17/gpibCoreConversion/conversionNotes.pdf">(PDF)</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-17/RELEASE_NOTES.html">Release Notes</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-17/KnownProblems.html">Known Problems</a></td>
+    </tr>
+    <tr>
+      <td>R4-16</td>
+      <td>3.14.11 or later</td>
+      <td><a href="https://epics.anl.gov/download/modules/asyn4-16.tar.gz">asyn4-16.tar.gz</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-16/asynDriver.html">asynDriver</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-16/asynDriver.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-16/devGpib.html">devGpib</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-16/devGpib.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-16/asynRecord.html">asynRecord</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-16/asynRecord.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-16/asynDoxygenHTML/index.html">Doxygen</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-16/HowToDoSerial/tutorial.pdf">HowToDoSerial (PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-16/gpibCoreConversion/conversionNotes.html">gpibCoreConversion</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-16/gpibCoreConversion/conversionNotes.pdf">(PDF)</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-16/RELEASE_NOTES.html">Release Notes</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-16/KnownProblems.html">Known Problems</a></td>
+    </tr>
+    <tr>
+      <td>R4-15</td>
+      <td>3.14.11 or later</td>
+      <td><a href="https://epics.anl.gov/download/modules/asyn4-15.tar.gz">asyn4-15.tar.gz</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-15/asynDriver.html">asynDriver</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-15/asynDriver.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-15/devGpib.html">devGpib</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-15/devGpib.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-15/asynRecord.html">asynRecord</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-15/asynRecord.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-15/asynDoxygenHTML/index.html">Doxygen</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-15/HowToDoSerial/tutorial.pdf">HowToDoSerial (PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-15/gpibCoreConversion/conversionNotes.html">gpibCoreConversion</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-15/gpibCoreConversion/conversionNotes.pdf">(PDF)</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-15/RELEASE_NOTES.html">Release Notes</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-15/KnownProblems.html">Known Problems</a></td>
+    </tr>
+    <tr>
+      <td>R4-14</td>
+      <td>3.14.11 or later</td>
+      <td><a href="https://epics.anl.gov/download/modules/asyn4-14.tar.gz">asyn4-14.tar.gz</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-14/asynDriver.html">asynDriver</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-14/asynDriver.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-14/devGpib.html">devGpib</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-14/devGpib.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-14/asynRecord.html">asynRecord</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-14/asynRecord.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-14/asynDoxygenHTML/index.html">Doxygen</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-14/HowToDoSerial/tutorial.pdf">HowToDoSerial (PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-14/gpibCoreConversion/conversionNotes.html">gpibCoreConversion</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-14/gpibCoreConversion/conversionNotes.pdf">(PDF)</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-14/RELEASE_NOTES.html">Release Notes</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-14/KnownProblems.html">Known Problems</a></td>
+    </tr>
+    <tr>
+      <td>R4-13-1</td>
+      <td>3.14.11 or later</td>
+      <td><a href="https://epics.anl.gov/download/modules/asyn4-13-1.tar.gz">asyn4-13-1.tar.gz</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-13-1/asynDriver.html">asynDriver</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-13-1/asynDriver.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-13-1/devGpib.html">devGpib</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-13-1/devGpib.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-13-1/asynRecord.html">asynRecord</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-13-1/asynRecord.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-13-1/asynDoxygenHTML/index.html">Doxygen</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-13-1/HowToDoSerial/tutorial.pdf">HowToDoSerial (PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-13-1/gpibCoreConversion/conversionNotes.html">gpibCoreConversion</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-13-1/gpibCoreConversion/conversionNotes.pdf">(PDF)</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-13-1/RELEASE_NOTES.html">Release Notes</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-13-1/KnownProblems.html">Known Problems</a></td>
+    </tr>
+    <tr>
+      <td>R4-13</td>
+      <td>3.14.11 or later</td>
+      <td><a href="https://epics.anl.gov/download/modules/asyn4-13.tar.gz">asyn4-13.tar.gz</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-13/asynDriver.html">asynDriver</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-13/asynDriver.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-13/devGpib.html">devGpib</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-13/devGpib.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-13/asynRecord.html">asynRecord</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-13/asynRecord.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-13/asynDoxygenHTML/index.html">Doxygen</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-13/HowToDoSerial/tutorial.pdf">HowToDoSerial (PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-13/gpibCoreConversion/conversionNotes.html">gpibCoreConversion</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-13/gpibCoreConversion/conversionNotes.pdf">(PDF)</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-13/RELEASE_NOTES.html">Release Notes</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-13/KnownProblems.html">Known Problems</a></td>
+    </tr>
+    <tr>
+      <td>R4-12</td>
+      <td>3.14.11 or later</td>
+      <td><a href="https://epics.anl.gov/download/modules/asyn4-12.tar.gz">asyn4-12.tar.gz</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-12/asynDriver.html">asynDriver</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-12/asynDriver.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-12/devGpib.html">devGpib</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-12/devGpib.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-12/asynRecord.html">asynRecord</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-12/asynRecord.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-12/asynDoxygenHTML/index.html">Doxygen</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-12/HowToDoSerial/tutorial.pdf">HowToDoSerial (PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-12/gpibCoreConversion/conversionNotes.html">gpibCoreConversion</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-12/gpibCoreConversion/conversionNotes.pdf">(PDF)</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-12/RELEASE_NOTES.html">Release Notes</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-12/KnownProblems.html">Known Problems</a></td>
+    </tr>
+    <tr>
+      <td>R4-11a</td>
+      <td>3.14.8 or later</td>
+      <td><a href="https://epics.anl.gov/download/modules/asyn4-11a.tar.gz">asyn4-11a.tar.gz</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-11a/asynDriver.html">asynDriver</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-11a/asynDriver.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-11a/devGpib.html">devGpib</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-11a/devGpib.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-11a/asynRecord.html">asynRecord</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-11a/asynRecord.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-11a/asynDoxygenHTML/index.html">Doxygen</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-11a/HowToDoSerial/tutorial.pdf">HowToDoSerial (PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-11a/gpibCoreConversion/conversionNotes.html">gpibCoreConversion</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-11a/gpibCoreConversion/conversionNotes.pdf">(PDF)</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-11a/RELEASE_NOTES.html">Release Notes</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-11a/KnownProblems.html">Known Problems</a></td>
+    </tr>
+    <tr>
+      <td>R4-10</td>
+      <td>3.14.8 or later</td>
+      <td><a href="https://epics.anl.gov/download/modules/asyn4-10.tar.gz">asyn4-10.tar.gz</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-10/asynDriver.html">asynDriver</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-10/asynDriver.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-10/devGpib.html">devGpib</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-10/devGpib.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-10/asynRecord.html">asynRecord</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-10/asynRecord.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-10/HowToDoSerial/tutorial.html">HowToDoSerial</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-10/HowToDoSerial/tutorial.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-10/gpibCoreConversion/conversionNotes.html">gpibCoreConversion</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-10/gpibCoreConversion/conversionNotes.pdf">(PDF)</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-10/RELEASE_NOTES.html">Release Notes</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-10/KnownProblems.html">Known Problems</a></td>
+    </tr>
+    <tr>
+      <td>R4-9</td>
+      <td>3.14.8 or later</td>
+      <td><a href="https://epics.anl.gov/download/modules/asyn4-9.tar.gz">asyn4-9.tar.gz</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-9/asynDriver.html">asynDriver</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-9/asynDriver.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-9/devGpib.html">devGpib</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-9/devGpib.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-9/asynRecord.html">asynRecord</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-9/asynRecord.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-9/HowToDoSerial/tutorial.html">HowToDoSerial</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-9/HowToDoSerial/tutorial.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-9/gpibCoreConversion/conversionNotes.html">gpibCoreConversion</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-9/gpibCoreConversion/conversionNotes.pdf">(PDF)</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-9/RELEASE_NOTES.html">Release Notes</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-9/KnownProblems.html">Known Problems</a></td>
+    </tr>
+    <tr>
+      <td>R4-8</td>
+      <td>3.14.8 or later</td>
+      <td><a href="https://epics.anl.gov/download/modules/asyn4-8.tar.gz">asyn4-8.tar.gz</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-8/asynDriver.html">asynDriver</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-8/asynDriver.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-8/devGpib.html">devGpib</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-8/devGpib.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-8/asynRecord.html">asynRecord</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-8/asynRecord.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-8/tutorial.html">HowToDoSerial</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-8/tutorial.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-8/conversionNotes.html">gpibCoreConversion</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-8/conversionNotes.pdf">(PDF)</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-8/RELEASE_NOTES.html">Release Notes</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-8/KnownProblems.html">Known Problems</a></td>
+    </tr>
+    <tr>
+      <td>R4-7</td>
+      <td>3.14.8 or later</td>
+      <td><a href="https://epics.anl.gov/download/modules/asyn4-7.tar.gz">asyn4-7.tar.gz</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-7/asynDriver.html">asynDriver</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-7/asynDriver.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-7/devGpib.html">devGpib</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-7/devGpib.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-7/asynRecord.html">asynRecord</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-7/asynRecord.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-7/tutorial.html">HowToDoSerial</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-7/tutorial.pdf">(PDF)</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-7/conversionNotes.html">gpibCoreConversion</a>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-7/conversionNotes.pdf">(PDF)</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-7/RELEASE_NOTES.html">Release Notes</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-7/KnownProblems.html">Known Problems</a></td>
+    </tr>
+    <tr>
+      <td>R4-6</td>
+      <td>3.14.8 or later</td>
+      <td><a href="https://epics.anl.gov/download/modules/asyn4-6.tar.gz">asyn4-6.tar.gz</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-6/asynDriver.pdf">asynDriver</a> <br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-6/devGpib.pdf">devGpib</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-6/asynRecord.pdf">asynRecord</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-6/tutorial.pdf">HowToDoSerial</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-6/conversionNotes.html">gpibCoreConversion</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-6/RELEASE_NOTES.html">Release Notes</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-6/KnownProblems.html">Known Problems</a></td>
+    </tr>
+    <tr>
+      <td>R4-5</td>
+      <td>3.14.8 or later</td>
+      <td><a href="https://epics.anl.gov/download/modules/asyn4-5.tar.gz">asyn4-5.tar.gz</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-5/asynDriver.html">asynDriver</a> <br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-5/devGpib.html">devGpib</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-5/asynRecord.html">asynRecord</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-5/HowToDoSerial/tutorial.html">HowToDoSerial</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-5/gpibCoreConversion/conversionNotes.html">gpibCoreConversion</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-5/RELEASE_NOTES.html">Release Notes</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-5/KnownProblems.html">Known Problems</a></td>
+    </tr>
+    <tr>
+      <td>R4-4</td>
+      <td>3.14.8 or later</td>
+      <td><a href="https://epics.anl.gov/download/modules/asyn4-4.tar.gz">asyn4-4.tar.gz</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-4/asynDriver.html">asynDriver</a> <br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-4/devGpib.html">devGpib</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-4/asynRecord.html">asynRecord</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-4/HowToDoSerial/tutorial.html">HowToDoSerial</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-4/gpibCoreConversion/conversionNotes.html">gpibCoreConversion</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-4/RELEASE_NOTES.html">Release Notes</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-4/KnownProblems.html">Known Problems</a></td>
+    </tr>
+    <tr>
+      <td>R4-3</td>
+      <td>3.14.6 or later</td>
+      <td><a href="https://epics.anl.gov/download/modules/asyn4-3.tar.gz">asyn4-3.tar.gz</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-3/asynDriver.html">asynDriver</a> <br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-3/devGpib.html">devGpib</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-3/asynRecord.html">asynRecord</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-3/HowToDoSerial/tutorial.html">HowToDoSerial</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-3/gpibCoreConversion/conversionNotes.html">gpibCoreConversion</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-3/RELEASE_NOTES.html">Release Notes</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-3/KnownProblems.html">Known Problems</a></td>
+    </tr>
+    <tr>
+      <td>R4-2-1</td>
+      <td>3.14.6 or later</td>
+      <td><a href="https://epics.anl.gov/download/modules/asyn4-2-1.tar.gz">asyn4-2-1.tar.gz</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-2-1/asynDriver.html">asynDriver</a> <br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-2-1/devGpib.html">devGpib</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-2-1/asynRecord.html">asynRecord</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-2-1/HowToDoSerial/tutorial.html">HowToDoSerial</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-2-1/gpibCoreConversion/conversionNotes.html">gpibCoreConversion</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-2-1/RELEASE_NOTES.html">Release Notes</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-2-1/KnownProblems.html">Known Problems</a></td>
+    </tr>
+    <tr>
+      <td>R4-2</td>
+      <td>3.14.6 or later</td>
+      <td><a href="https://epics.anl.gov/download/modules/asyn4-2.tar.gz">asyn4-2.tar.gz</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-2/asynDriver.html">asynDriver</a> <br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-2/devGpib.html">devGpib</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-2/asynRecord.html">asynRecord</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-2/HowToDoSerial/tutorial.html">HowToDoSerial</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-2/gpibCoreConversion/conversionNotes.html">gpibCoreConversion</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-2/RELEASE_NOTES.html">Release Notes</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-2/KnownProblems.html">Known Problems</a></td>
+    </tr>
+    <tr>
+      <td>R4-1</td>
+      <td>3.14.6</td>
+      <td><a href="https://epics.anl.gov/download/modules/asyn4-1.tar.gz">asyn4-1.tar.gz</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-1/asynDriver.html">asynDriver</a> <br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-1/devGpib.html">devGpib</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-1/asynRecord.html">asynRecord</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-1/HowToDoSerial/tutorial.html">HowToDoSerial</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-1/gpibCoreConversion/conversionNotes.html">gpibCoreConversion</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-1/RELEASE_NOTES.html">Release Notes</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-1/KnownProblems.html">Known Problems</a></td>
+    </tr>
+    <tr>
+      <td>R4-0</td>
+      <td>3.14.6</td>
+      <td><a href="https://epics.anl.gov/download/modules/asyn4-0.tar.gz">asyn4-0.tar.gz</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-0/asynDriver.html">asynDriver</a> <br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-0/devGpib.html">devGpib</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-0/asynRecord.html">asynRecord</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-0/HowToDoSerial/tutorial.html">HowToDoSerial</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R4-0/gpibCoreConversion/conversionNotes.html">gpibCoreConversion</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-0/RELEASE_NOTES.html">Release Notes</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R4-0/KnownProblems.html">Known Problems</a></td>
+    </tr>
+    <tr>
+      <td>R3-3</td>
+      <td>3.14.6</td>
+      <td><a href="https://epics.anl.gov/download/modules/asyn3-3.tar.gz">asyn3-3.tar.gz</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R3-3/asynDriver.html">asynDriver</a> <br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R3-3/devGpib.html">devGpib</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R3-3/asynRecord.html">asynRecord</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R3-3/HowToDoSerial/tutorial.html">HowToDoSerial</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R3-3/gpibCoreConversion/conversionNotes.html">gpibCoreConversion</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R3-3/RELEASE_NOTES.html">Release Notes</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R3-3/KnownProblems.html">Known Problems</a></td>
+    </tr>
+    <tr>
+      <td>R3-2</td>
+      <td>3.14.6</td>
+      <td><a href="https://epics.anl.gov/download/modules/asyn3-2.tar.gz">asyn3-2.tar.gz</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R3-2/asynDriver.html">asynDriver</a> <br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R3-2/devGpib.html">devGpib</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R3-2/asynRecord.html">asynRecord</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R3-2/HowToDoSerial/tutorial.html">HowToDoSerial</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R3-2/gpibCoreConversion/conversionNotes.html">gpibCoreConversion</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R3-2/RELEASE_NOTES.html">Release Notes</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R3-2/KnownProblems.html">Known Problems</a></td>
+    </tr>
+    <tr>
+      <td>R3-1</td>
+      <td>3.14.5 but 3.14.6 recommended</td>
+      <td><a href="https://epics.anl.gov/download/modules/asyn3-1.tar.gz">asyn3-1.tar.gz</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R3-1/asynDriver.html">asynDriver.html</a> <br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R3-1/devGpib.html">devGpib.html</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R3-1/asynRecord.html">asynRecord.html</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R3-1/RELEASE_NOTES.html">Release Notes</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R3-1/KnownProblems.html">Known Problems</a></td>
+    </tr>
+    <tr>
+      <td>R2-1</td>
+      <td>3.14.5 but 3.14.6 recommended</td>
+      <td><a href="https://epics.anl.gov/download/modules/asyn2-1.tar.gz">asyn2-1.tar.gz</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R2-1/asynDriver.html">asynDriver.html</a> <br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R2-1/devGpib.html">devGpib.html</a><br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R2-1/asynOctetRecord.html">asynOctetRecord.html</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R2-1/RELEASE_NOTES.html">Release Notes</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R2-1/KnownProblems.html">Known Problems</a></td>
+    </tr>
+    <tr>
+      <td>R1-2</td>
+      <td>3.14.5</td>
+      <td><a href="https://epics.anl.gov/download/modules/asyn1-2.tar.gz">asyn1-2.tar.gz</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R1-2/asynDriver.html">asynDriver.html</a> <br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R1-2/devGpib.html">devGpib.html</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R1-2/RELEASE_NOTES.html">Release Notes</a></td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <td>R1-1</td>
+      <td>3.14.5</td>
+      <td><a href="https://epics.anl.gov/download/modules/asyn1-1.tar.gz">asyn1-1.tar.gz</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R1-1/asynDriver.html">asynDriver.html</a> <br>
+        <a href="https://epics.anl.gov/modules/soft/asyn/R1-1/devGpib.html">devGpib.html</a></td>
+      <td><a href="https://epics.anl.gov/modules/soft/asyn/R1-1/RELEASE_NOTES.html">Release Notes</a></td>
+      <td>See release note R1-2</td>
+    </tr>
+  </tbody>
+</table>
+
+<address>
+  <a href="mailto:rivers@cars.uchicago.edu">Mark Rivers</a>
+</address>
+
+
+
+</body></html>
