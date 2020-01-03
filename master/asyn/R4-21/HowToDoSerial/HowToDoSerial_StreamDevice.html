@@ -1,0 +1,993 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="Content-Type">
+  <title>HowToDoSerial(StreamDevice)</title>
+</head>
+<body>
+<h1 style="text-align: center;">How to use StreamDevice and ASYN to
+create EPICS device support for a simple serial, GPIB, or network
+attached device</h1>
+<div style="text-align: center;"><br>
+W. Eric Norum<br>
+<a href="mailto://wenorum@lbl.gov">wenorum@lbl.gov</a><br>
+<br>
+</div>
+<br>
+<h2>1&nbsp;&nbsp;&nbsp; Introduction</h2>
+This tutorial provides step-by-step instructions on how to create EPICS
+support for a simple serial, GPIB (IEEE-488) or network attached
+device. The steps are presented in a way that should make it possible
+to apply them in cookbook fashion to create support for other devices.
+For comprehensive description of all the details of the I/O system used
+here, refer to the <a
+ href="http://www.aps.anl.gov/epics/modules/soft/asyn/R4-14/asynDriver.pdf">asynDriver</a>
+and <a href="http://epics.web.psi.ch/software/streamdevice/doc/">StreamDevice</a>
+documentation.<br>
+<br>
+This document isn't for the absolute newcomer though. You must have
+EPICS installed on a system somewhere and know how to build and run the
+example application. In particular you must have the following
+installed: <br>
+<ul>
+  <li>EPICS R3.14.11 or higher.</li>
+  <li>EPICS ASYN support module version 4.14 or higher.</li>
+  <li>EPICS StreamDevice support module version 2.4.1 or higher.</li>
+</ul>
+Serial, GPIB and network attached devices can now be treated in much
+the same way. The EPICS StreamDevice and ASYN support modules can use
+drivers which communicate with serial devices connected to ports on the
+IOC or to Ethernet/Serial converters or with GPIB devices connected to
+local I/O cards or to Ethernet/GPIB converters or to network attached
+devices using VXI-11 or plain TCP ('telnet') communication protocols.<br>
+<br>
+I based this tutorial on the device support I wrote for a Hewlett
+Packard&nbsp; E3631A power supply.&nbsp; I chose the E3610A as the
+basis for this tutorial partly because it was what I found lying around
+but mostly because it uses SCPI-compliant commands which are common to
+a wide range of devices.&nbsp; Sections 1 through 4 of this tutorial
+apply to all SCPI (IEEE-488.2) devices.<br>
+<br>
+<h2>2&nbsp;&nbsp;&nbsp; Create a new device support module</h2>
+The easiest way to do this is with the makeSupport.pl script supplied
+with the EPICS ASYN package.<br>
+<br>
+Here are the commands I ran. To make the command examples a little
+shorter I used shell variables to hold the paths to my installation of
+EPICS base and the ASYN support module.&nbsp; You can do this with
+values appropriate for your site or just type the full path names to
+the commands.<br>
+<br>
+<span style="font-family: monospace;">EPICS_BASE=/usr/local/epics/R3.14.11/base</span><br>
+<span style="font-family: monospace;">ASYN=/usr/local/epics/R3.14.11/modules/soft/synApps_5_5/support/asyn-4-14</span><br>
+<br>
+You will have to change these to the values appropriate for your EPICS
+installation or simply type the appropriate full paths to invoke the
+scripts.&nbsp; You must also have the EPICS_HOST_ARCH environment
+variable set to match the machine on which you are building.<br>
+<br>
+To create a new StreamDevice support module:<br>
+<br>
+<span style="font-family: monospace;">norume&gt; <span
+ style="font-weight: bold;">mkdir HPE3631A</span></span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">norume&gt; <span
+ style="font-weight: bold;">cd HPE3631A</span></span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">norume&gt; <span
+ style="font-weight: bold;">$ASYN/bin/</span></span><span
+ style="font-family: monospace; font-weight: bold;">$EPICS_HOST_ARCH/makeSupport.pl
+-t
+streamSCPI
+HPE3631A</span><br>
+<br>
+<h3>2.1&nbsp;&nbsp;&nbsp; Make changes to some files in configure/</h3>
+Edit the configure/RELEASE file which makeSupport.pl created and
+confirm that the entries describing the paths to your EPICS base and
+ASYN support are correct. For example these might be:<br>
+<br>
+<span style="font-family: monospace;">ASYN =
+/usr/local/epics/R3.14.11/modules/soft/synApps_5_5/support/asyn-4-14</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">EPICS_BASE =
+/usr/local/epics/R3.14.11/base</span><br>
+<br>
+You'll also have to add a line describing the path to your StreamDevice
+support.&nbsp; For example:<br>
+<br>
+<span style="font-family: monospace;">STREAM =
+/usr/local/epics/R3.14.11/modules/soft/synApps_5_5/support/stream-2-4-1</span><br>
+<br>
+Edit the configure/CONFIG_SITE file which makeSupport.pl created and
+specify the IOC architectures on which the application is to run. I
+wanted the application to run as a soft IOC, so I uncommented the
+CROSS_COMPILER_TARGET_ARCHS definition and set the definition to be
+empty: <br>
+<br>
+CROSS_COMPILER_TARGET_ARCHS =<br>
+<br>
+You may have to fix an error in the HPE3631ASup/devHPE3631A.db file
+produced by the makeSupport.pl command.&nbsp; Verify that the IDNwf
+record description looks like:<br>
+<span style="font-family: monospace;">record(waveform, "$(P)$(R)IDNwf")</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">{</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(DESC,
+"SCPI identification string")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(DTYP,
+"stream")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;
+field(INP,&nbsp; "@devHPE3631A.proto getIDN(199) $(PORT) $(A)")</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(PINI,
+"YES")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(FTVL,
+"CHAR")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(NELM,
+"200")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">}</span><br>
+Some versions of the template have <span
+ style="font-family: monospace;">FTYP</span> rathern than <span
+ style="font-family: monospace;">FTVL</span> for the waveform data type
+field.<br>
+<br>
+I install the StreamDevice protocol file into the support module db/
+directory.&nbsp; This seems like a reasonable place to put this file
+since it's tied closely to its associated database file.&nbsp;&nbsp; To
+have the protocol file installed into the db/ directory edit
+HPE3631ASup/Makefile and add the line<br>
+<span style="font-family: monospace;">DB_INSTALLS +=
+$(TOP)/HPE3631ASup/devHPE3631A.proto</span><br>
+to the list of DB_INSTALLS.<br>
+<br>
+<h2>3&nbsp;&nbsp;&nbsp; Create a test application (optional)</h2>
+Now that a device support module has been produced it is a good idea to
+create a new EPICS application to confirm that the device support is
+operating correctly. The easiest way to do this is with the
+makeBaseApp.pl script supplied with EPICS.&nbsp;&nbsp; The files in the
+configure/ directory produced in the previous step do not provide all
+the information needed to build an application but will not be
+overwritten by the makeBaseApp.pl script.&nbsp; The easiest solution to
+this problem is to simply remove the configure/ directory and all its
+contents and then to make the changes to configure/RELEASE and
+configure/CONFIG_SITE at mentioned above.<br>
+<br>
+Here are the commands I ran.&nbsp; <br>
+<br>
+<span style="font-family: monospace;">norume&gt; <span
+ style="font-weight: bold;">rm -rf configure</span> </span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">norume&gt; <span
+ style="font-weight: bold;">$EPICS_BASE/bin/$EPICS_HOST_ARCH/makeBaseApp.pl
+-t
+ioc
+HPE3631Atest</span></span><br style="font-family: monospace;">
+<span style="font-family: monospace;">norume&gt; <span
+ style="font-weight: bold;">$EPICS_BASE/bin/$EPICS_HOST_ARCH/makeBaseApp.pl
+-t
+ioc
+-i
+HPE3631Atest</span></span><br style="font-family: monospace;">
+<span style="font-family: monospace;">The following target
+architectures are available in base:</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; darwin-x86</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; RTEMS-mvme2100</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; RTEMS-mvme3100</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; RTEMS-uC5282</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">What architecture do you want to
+use? <span style="font-weight: bold;">darwin-x86</span></span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">The following applications are
+available:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; HPE3631Atest</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">What application should the
+IOC(s) boot?</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">The default uses the IOC's name,
+even if not listed above.</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">Application name? </span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">norume&gt; </span><br>
+<br>
+I then added the ASYN and STREAM values to configure/RELEASE and made
+the change to the CROSS_COMPILER_TARGET_ARCHS line in
+configure/CONFIG_SITE.<br>
+<br>
+You must add the StreamDevice and ASYN support modules to the test
+application.&nbsp; Edit HPE3631AtestApp/src/Makefile and add the lines:<br>
+<br>
+<span style="font-family: monospace;">HPE3631Atest_DBD += stream.dbd</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">HPE3631Atest_DBD +=
+drvAsynSerialPort.dbd</span><br>
+and<br>
+<span style="font-family: monospace;">HPE3631Atest_LIBS += stream asyn</span><br>
+<br>
+To install the support module files and build the test application
+simply run make:<br>
+<br>
+norume&gt; <span style="font-weight: bold;">make</span><br
+ style="font-weight: bold;">
+&nbsp;&nbsp;&nbsp; .<br>
+&nbsp;&nbsp;&nbsp; .<br>
+&nbsp;&nbsp;&nbsp; .<br>
+norume&gt;<br>
+<br>
+The IOC startup script produced by the makeBaseApp.pl script must be
+modified before the test application can be run.&nbsp; Change
+directories to iocBoot/iocHPE3631Atest and edit the st.cmd file.&nbsp;
+Here's the file that I use:<br>
+<br>
+<span style="font-family: monospace;">&nbsp; 1
+#!../../bin/darwin-x86/HPE3631Atest<br>
+&nbsp; 2 <br>
+&nbsp; 3
+###############################################################################<br>
+&nbsp; 4 # Set up environment<br>
+&nbsp; 5 &lt; envPaths<br>
+&nbsp; 6 epicsEnvSet "STREAM_PROTOCOL_PATH" "$(TOP)/db"<br>
+&nbsp; 7 <br>
+&nbsp; 8
+###############################################################################<br>
+&nbsp; 9 # Allow PV name prefixes and serial port name to be set from
+the environment<br>
+&nbsp;10 epicsEnvSet "P" "$(P=hpE3631A)"<br>
+&nbsp;11 epicsEnvSet "R" "$(R=Test)"<br>
+&nbsp;12 epicsEnvSet "TTY" "$(TTY=/dev/tty.PL2303-000013FA)"<br>
+&nbsp;13 <br>
+&nbsp;14
+###############################################################################<br>
+&nbsp;15 ## Register all support components<br>
+&nbsp;16 cd "${TOP}"<br>
+&nbsp;17 dbLoadDatabase "dbd/HPE3631Atest.dbd"<br>
+&nbsp;18 HPE3631Atest_registerRecordDeviceDriver pdbbase<br>
+&nbsp;19 <br>
+&nbsp;20
+###############################################################################<br>
+&nbsp;21 # Set up ASYN ports<br>
+&nbsp;22 # drvAsynSerialPortConfigure port ipInfo priority
+noAutoconnect noProcessEos<br>
+&nbsp;23 drvAsynSerialPortConfigure("L0","$(TTY)",0,0,0)<br>
+&nbsp;24 asynSetOption("L0", -1, "baud", "600")<br>
+&nbsp;25 asynSetOption("L0", -1, "bits", "8")<br>
+&nbsp;26 asynSetOption("L0", -1, "parity", "none")<br>
+&nbsp;27 asynSetOption("L0", -1, "stop", "2")<br>
+&nbsp;28 asynSetOption("L0", -1, "clocal", "Y")<br>
+&nbsp;29 asynSetOption("L0", -1, "crtscts", "Y")<br>
+&nbsp;30 asynOctetSetInputEos("L0", -1, "\n")<br>
+&nbsp;31 asynOctetSetOutputEos("L0", -1, "\n")<br>
+&nbsp;32 asynSetTraceIOMask("L0",-1,0x2)<br>
+&nbsp;33 asynSetTraceMask("L0",-1,0x9)<br>
+&nbsp;34 <br>
+&nbsp;35
+###############################################################################<br>
+&nbsp;36 ## Load record instances<br>
+&nbsp;37 dbLoadRecords("db/devHPE3631A.db","P=$(P),R=$(R),PORT=L0,A=0")<br>
+&nbsp;38 <br>
+&nbsp;39
+###############################################################################<br>
+&nbsp;40 ## Start EPICS<br>
+&nbsp;41 cd "${TOP}/iocBoot/${IOC}"<br>
+&nbsp;42 iocInit<br>
+</span><br>
+Lines that you'll likely have to modify are:<br>
+<br>
+<table style="width: 100%;" border="1" cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr>
+      <td>10,11</td>
+      <td>The prefix applied to all PV names.</td>
+    </tr>
+    <tr>
+      <td>12</td>
+      <td>The name of your serial line (for network attached
+devices or LAN/Serial adapters this will be something like
+192.168.0.23:4001).</td>
+    </tr>
+    <tr>
+      <td>23</td>
+      <td>The command would be drvAsynIPPortConfigure for
+LAN/Serial adapters or network attached devices. See the
+asynDriver documentation for information on connecting to GPIB devices.</td>
+    </tr>
+    <tr>
+      <td>24-29</td>
+      <td>The serial line settings for your device (for
+network attached devices or LAN/Serial adapters or GPIB devices these
+lines can
+be removed or commented out).</td>
+    </tr>
+    <tr>
+      <td>30,31</td>
+      <td>GPIB devices may not need line terminators
+since they can use the EOI line to mark the end of messages.</td>
+    </tr>
+    <tr>
+      <td>33</td>
+      <td>This trace mask value prints a message showing the
+characters sent to and received from the device. This can produce
+a lot of messages on the IOC console. To display error messages
+only set the trace mask to 1 rather than 9.</td>
+    </tr>
+  </tbody>
+</table>
+<br>
+So, if you have a LAN/Serial adapter or network attached device which
+uses a raw TCP ('telnet' style) connection you would replace lines 23
+through 29 with a single line like:<br>
+<span style="font-family: monospace;">drvAsynIPPortConfigure("L0","192.168.0.23:4001",0,0,0)</span><br>
+You would also change the application Makefile to specify
+drvAsynIPPort.dbd rather than drvAsynSerialPort.dbd.<br>
+<br>
+I you have a VXI-11 LAN/GPIB adapter or network attached device you
+would replace lines 23
+through 31 with a single line like:<br>
+<span style="font-family: monospace;">vxi11Configure("L0","192.168.0.24",0,0.0,"gpib0",0,0)</span><br>
+You would also change the application Makefile to specify drfvVxi11.dbd
+rather than drvAsynSerialPort.dbd.<br>
+<h2>3.1&nbsp;&nbsp;&nbsp; Run the test application</h2>
+The application can be started by running the startup script if you
+make the script executable:<br>
+<br>
+<span style="font-family: monospace;">norume&gt; <span
+ style="font-weight: bold;">cd iocBoot/iocHPE3631Atest </span></span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">norume&gt; <span
+ style="font-weight: bold;">chmod +x st.cmd</span></span><br>
+<br>
+Then the application can be run by:<br>
+<br>
+<span style="font-family: monospace;">norume&gt; <span
+ style="font-weight: bold;">./st.cmd</span></span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">#!../../bin/darwin-x86/HPE3631Atest</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">###############################################################################</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;"># Set up environment</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">&lt; envPaths</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">epicsEnvSet("ARCH","darwin-x86")</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">epicsEnvSet("IOC","iocHPE3631Atest")</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">epicsEnvSet("TOP","/Users/wenorum/tmp/t/HPE3631A")</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">epicsEnvSet("ASYN","/usr/local/epics/R3.14.11/modules/soft/synApps_5_5/support/asyn-4-14")</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">epicsEnvSet("STREAM","/usr/local/epics/R3.14.11/modules/soft/synApps_5_5/support/stream-2-4-1")</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">epicsEnvSet("EPICS_BASE","/usr/local/epics/R3.14.11/base")</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">epicsEnvSet
+"STREAM_PROTOCOL_PATH" "/Users/wenorum/tmp/t/HPE3631A/db"</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">###############################################################################</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;"># Allow PV name prefixes and
+serial port name to be set from the environment</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">epicsEnvSet "P" "hpE3631A"</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">epicsEnvSet "R" "Test"</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">epicsEnvSet "TTY"
+"/dev/tty.PL2303-000013FA"</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">###############################################################################</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">## Register all support components</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">cd "/Users/wenorum/tmp/t/HPE3631A"</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">dbLoadDatabase
+"dbd/HPE3631Atest.dbd"</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">HPE3631Atest_registerRecordDeviceDriver
+pdbbase</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">###############################################################################</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;"># Set up ASYN ports</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;"># drvAsynSerialPortConfigure port
+ipInfo priority noAutoconnect noProcessEos</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">drvAsynSerialPortConfigure("L0","/dev/tty.PL2303-000013FA",0,0,0)</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">asynSetOption("L0", -1, "baud",
+"9600")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">asynSetOption("L0", -1, "bits",
+"8")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">asynSetOption("L0", -1, "parity",
+"none")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">asynSetOption("L0", -1, "stop",
+"2")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">asynSetOption("L0", -1, "clocal",
+"Y")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">asynSetOption("L0", -1,
+"crtscts", "Y")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">asynOctetSetInputEos("L0", -1,
+"\n")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">asynOctetSetOutputEos("L0", -1,
+"\n")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">asynSetTraceIOMask("L0",-1,0x2)</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">asynSetTraceMask("L0",-1,0x9)</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">###############################################################################</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">## Load record instances</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">dbLoadRecords("db/devHPE3631A.db","P=hpE3631A,R=Test,PORT=L0,A=0")</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">###############################################################################</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">## Start EPICS</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">cd
+"/Users/wenorum/tmp/t/HPE3631A/iocBoot/iocHPE3631Atest"</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">iocInit</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">Starting iocInit</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">############################################################################</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">## EPICS R3.14.11 $R3-14-11$
+$2009/08/28 18:47:36$</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">## EPICS Base built Aug 24 2010</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">############################################################################</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">2010/08/31 13:10:32.986
+/dev/tty.PL2303-000013FA write 6</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">*IDN?\n</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">iocRun: All initialization
+complete</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">2010/08/31 13:10:33.116
+/dev/tty.PL2303-000013FA read 1</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">H</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">2010/08/31 13:10:33.135
+/dev/tty.PL2303-000013FA read 1</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">E</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">2010/08/31 13:10:33.153
+/dev/tty.PL2303-000013FA read 1</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">W</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">2010/08/31 13:10:33.171
+/dev/tty.PL2303-000013FA read 1</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">L</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">2010/08/31 13:10:33.189
+/dev/tty.PL2303-000013FA read 1</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">E</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">2010/08/31 13:10:33.208
+/dev/tty.PL2303-000013FA read 1</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">T</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">2010/08/31 13:10:33.226
+/dev/tty.PL2303-000013FA read 1</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">T</span><br>
+<span style="font-family: monospace;">.</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">.</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">.</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">epics&gt; <span
+ style="font-weight: bold;">dbpr hpE3631ATestIDN</span></span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">ASG:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+DESC:
+SCPI
+identification
+string&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+DISA:
+0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">DISP:
+0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+DISV:
+1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+NAME:
+hpE3631ATestIDN&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">SEVR:
+NO_ALARM&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; STAT:
+NO_ALARM&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+SVAL:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+TPRO:
+0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">VAL:
+HEWLETT-PACKARD,E3631A,0,2.1-5.0-1.0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">epics&gt; </span><br>
+<br>
+<br>
+<br>
+The SCPI IDN*? commands are run as part of iocInit since their records
+have PINI=YES.&nbsp;&nbsp;&nbsp; If the stringin record has truncated
+the identification string you should be able to see the full string as
+a waveform record.&nbsp; In another window run:<br>
+<br>
+<span style="font-family: monospace;">norume&gt; <span
+ style="font-weight: bold;">caget -S hpE3631ATestIDNwf</span></span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">hpE3631ATestIDNwf
+HEWLETT-PACKARD,E3631A,0,2.1-5.0-1.0</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">norume&gt; </span><br>
+<br>
+<h2>4&nbsp;&nbsp;&nbsp; asynRecord support</h2>
+The asynRecord provides a convenient mechanism for controlling the
+diagnostic messages produced by asyn drivers. You can also use the MEDM
+asynOctet screen to manually send commands to and view responses from a
+device.&nbsp; This can be very handy when trying to figure out just how
+a new device actually works.<br>
+<br>
+To use an asynRecord in
+your application: <br>
+<br>
+Add the line:<br>
+<br>
+<span style="font-family: monospace;">DB_INSTALLS +=
+$(ASYN)/db/asynRecord.db</span><br>
+<br>
+to the application Makefile.<br>
+<br>
+Create the diagnostic record in the IOC by adding a line like:<br>
+<br>
+<span style="font-family: monospace;">dbLoadRecords("db/asynRecord.db","P=$(P)$(R),R=asyn,PORT=L0,ADDR=-1,OMAX=0,IMAX=0")</span><br>
+<br>
+to the application startup script. The PORT value must match the the
+value in the corresponding drvAsynIPPortConfigure or
+drvAsynSerialPortConfigure command. The ADDR value should be that of
+the instrument whose I/O you wish to monitor. <br>
+<br>
+To run the asynRecord screen, add <span style="font-family: monospace;">&lt;<span
+ style="font-style: italic;">asynTop</span>&gt;/medm</span> to your
+EPICS_DISPLAY_PATH environment variable and start medm with P, R, PORT
+and ADDR values matching those given in the dbLoadRecords command:<br>
+<br>
+<span style="font-family: monospace; font-weight: bold;">medm -x -macro
+"P=hpE3631ATest,R=asyn,PORT=L0,ADDR=-1" asynRecord.adl</span><br>
+<br>
+<h2>5&nbsp;&nbsp;&nbsp; Add records and protocol file entries</h2>
+The descriptions in this section apply directly to the HP E3631A only
+but may provide useful hints for adding commands for your particular
+device.<br>
+<br>
+<h3>5.1&nbsp;&nbsp;&nbsp; Add a record to set the device to local or
+remote control</h3>
+First add an entry to HPE3631ASup/devHPE3631A.proto:<br>
+<br>
+<span style="font-family: monospace;">setLocRem {</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; out
+"SYST:%{LOC|REM}";</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">}</span><br>
+<br>
+This uses the StreamDevice ENUM converter to send one of two strings to
+the device based on the PV value.&nbsp; The corresponding addition to
+HPE3631ASup/devHPE3631A.db is:<br>
+<br>
+<span style="font-family: monospace;">record(bo, "$(P)$(R)SetRemote")</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">{</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(DESC,
+"Set into local/remote mode")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(DTYP,
+"stream")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;
+field(OUT,&nbsp; "@devHPE3631A.proto setLocRem $(PORT) $(A)")</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(ZNAM,
+"Local")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(ONAM,
+"Remote")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(PINI,
+"YES")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;
+field(VAL,&nbsp; "1")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">}</span><br>
+<br>
+The PINI and VAL fields ensure that the device is set into remote
+control mode during IOC startup.<br>
+<br>
+Once you've made the above changes run <span style="font-weight: bold;">make</span>
+to install the modified files.&nbsp; If you've created the test
+application you can try out the new command and see if it works.<br>
+<br>
+<h3>5.2&nbsp;&nbsp;&nbsp; Add records to set and check the output
+on/off status</h3>
+These are simple since they use StreamDevice protocol entries that
+already exist.&nbsp; The setD and getD entries set and get the value of
+a single integer parameter whose command is passed as the argument to
+the protocol entry:<br>
+<br>
+<span style="font-family: monospace;">record(bo, "$(P)$(R)SetOnOff")</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">{</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(DESC,
+"Turn output off/on")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(DTYP,
+"stream")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;
+field(OUT,&nbsp; "@devHPE3631A.proto setD(OUTP) $(PORT) $(A)")</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(ZNAM,
+"Off")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(ONAM,
+"On")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">}</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">record(bi, "$(P)$(R)GetOnOff")</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">{</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(DESC,
+"Is output on?")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(DTYP,
+"stream")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;
+field(INP,&nbsp; "@devHPE3631A.proto getD(OUTP) $(PORT) $(A)")</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(ZNAM,
+"Off")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(ONAM,
+"On")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">}</span><br>
+<br>
+<h3>5.3&nbsp;&nbsp;&nbsp; Add records to set and check the output
+voltage and current setpoints</h3>
+Add two entries to HPE3631ASup/devHPE3631A.proto:<br>
+<br>
+<span style="font-family: monospace;">setVI {</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; out "INST
+\$1;\$2 %g";</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">}</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">getVI {</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; out "INST
+\$1;\$2?";</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; in "%g";</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; ExtraInput =
+Ignore;</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">}</span><br>
+<br>
+These entries set and get the floating point value for the channel
+passed as the first argument and for the parameter passed as the second
+argument.<br>
+<br>
+The corresponding additions to HPE3631ASup/devHPE3631A.db are:<br>
+<br>
+<span style="font-family: monospace;">record(ao, "$(P)$(R)SetP6Volts")</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">{</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(DESC,
+"Set +6V output volage")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(DTYP,
+"stream")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;
+field(OUT,&nbsp; "@devHPE3631A.proto setVI(P6V,VOLT) $(PORT) $(A)")</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;
+field(EGU,&nbsp; "Volts")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(LOPR,
+"0")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(HOPR,
+"6.18")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(EGUL,
+"0")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(EGUF,
+"6.18")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(DRVL,
+"0")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(DRVH,
+"6.18")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">}</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">record(ao, "$(P)$(R)SetP6Amps")</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">{</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(DESC,
+"Set +6V output current")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(DTYP,
+"stream")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;
+field(OUT,&nbsp; "@devHPE3631A.proto setVI(P6V,CURR) $(PORT) $(A)")</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;
+field(EGU,&nbsp; "Amps")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(LOPR,
+"0")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(HOPR,
+"5.15")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(EGUL,
+"0")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(EGUF,
+"5.15")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(DRVL,
+"0")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(DRVH,
+"5.15")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">}</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">record(ao, "$(P)$(R)SetP25Volts")</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">{</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(DESC,
+"Set +25V output volage")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(DTYP,
+"stream")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;
+field(OUT,&nbsp; "@devHPE3631A.proto setVI(P25V,VOLT) $(PORT) $(A)")</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;
+field(EGU,&nbsp; "Volts")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(LOPR,
+"0")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(HOPR,
+"25.75")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(EGUL,
+"0")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(EGUF,
+"25.75")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(DRVL,
+"0")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(DRVH,
+"25.75")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">}</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">record(ao, "$(P)$(R)SetP25Amps")</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">{</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(DESC,
+"Set +25V output current")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(DTYP,
+"stream")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;
+field(OUT,&nbsp; "@devHPE3631A.proto setVI(P25V,CURR) $(PORT) $(A)")</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;
+field(EGU,&nbsp; "Amps")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(LOPR,
+"0")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(HOPR,
+"1.03")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(EGUL,
+"0")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(EGUF,
+"1.03")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(DRVL,
+"0")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(DRVH,
+"1.03")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">}</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">record(ao, "$(P)$(R)SetN25Volts")</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">{</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(DESC,
+"Set -25V output volage")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(DTYP,
+"stream")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;
+field(OUT,&nbsp; "@devHPE3631A.proto setVI(N25V,VOLT) $(PORT) $(A)")</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;
+field(EGU,&nbsp; "Volts")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(HOPR,
+"0")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(LOPR,
+"-25.75")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(EGUF,
+"0")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(EGUL,
+"-25.75")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(DRVH,
+"0")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(DRVL,
+"-25.75")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">}</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">record(ao, "$(P)$(R)SetN25Amps")</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">{</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(DESC,
+"Set -25V output current")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(DTYP,
+"stream")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;
+field(OUT,&nbsp; "@devHPE3631A.proto setVI(N25V,CURR) $(PORT) $(A)")</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;
+field(EGU,&nbsp; "Amps")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(LOPR,
+"0")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(HOPR,
+"1.03")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(EGUL,
+"0")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(EGUF,
+"1.03")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(DRVL,
+"0")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(DRVH,
+"1.03")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">}</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">record(ao, "$(P)$(R)GetP6Volts")</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">{</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(DESC,
+"Get +6V output volage")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(DTYP,
+"stream")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;
+field(OUT,&nbsp; "@devHPE3631A.proto getVI(P6V,VOLT) $(PORT) $(A)")</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;
+field(EGU,&nbsp; "Volts")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(LOPR,
+"0")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(HOPR,
+"6.18")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(EGUL,
+"0")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(EGUF,
+"6.18")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">}</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">record(ao, "$(P)$(R)GetP6Amps")</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">{</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(DESC,
+"Get +6V output current")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(DTYP,
+"stream")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;
+field(OUT,&nbsp; "@devHPE3631A.proto getVI(P6V,CURR) $(PORT) $(A)")</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;
+field(EGU,&nbsp; "Amps")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(LOPR,
+"0")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(HOPR,
+"5.15")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(EGUL,
+"0")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(EGUF,
+"5.15")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">}</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">record(ao, "$(P)$(R)GetP25Volts")</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">{</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(DESC,
+"Get +25V output volage")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(DTYP,
+"stream")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;
+field(OUT,&nbsp; "@devHPE3631A.proto getVI(P25V,VOLT) $(PORT) $(A)")</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;
+field(EGU,&nbsp; "Volts")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(LOPR,
+"0")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(HOPR,
+"25.75")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(EGUL,
+"0")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(EGUF,
+"25.75")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">}</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">record(ao, "$(P)$(R)GetP25Amps")</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">{</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(DESC,
+"Get +25V output current")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(DTYP,
+"stream")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;
+field(OUT,&nbsp; "@devHPE3631A.proto getVI(P25V,CURR) $(PORT) $(A)")</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;
+field(EGU,&nbsp; "Amps")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(LOPR,
+"0")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(HOPR,
+"1.03")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(EGUL,
+"0")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(EGUF,
+"1.03")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">}</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">record(ao, "$(P)$(R)GetN25Volts")</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">{</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(DESC,
+"Get -25V output volage")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(DTYP,
+"stream")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;
+field(OUT,&nbsp; "@devHPE3631A.proto getVI(N25V,VOLT) $(PORT) $(A)")</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;
+field(EGU,&nbsp; "Volts")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(LOPR,
+"-25.75")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(HOPR,
+"0")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(EGUL,
+"-25.75")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(EGUF,
+"0")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">}</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">record(ao, "$(P)$(R)GetN25Amps")</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">{</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(DESC,
+"Get -25V output current")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(DTYP,
+"stream")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;
+field(OUT,&nbsp; "@devHPE3631A.proto getVI(N25V,CURR) $(PORT) $(A)")</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;
+field(EGU,&nbsp; "Amps")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(LOPR,
+"0")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(HOPR,
+"1.03")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(EGUL,
+"0")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; field(EGUF,
+"1.03")</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">}</span><br>
+<br>
+Depending on your application you might set up FLNK and/or SCAN fields
+to keep the setpoint readbacks up to date.<br>
+<br>
+<br>
+</body>
+</html>

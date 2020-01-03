@@ -1,0 +1,1210 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with jLaTeX2HTML 2002 (1.62) JA patch-1.4
+patched version by:  Kenshi Muto, Debian Project.
+LaTeX2HTML 2002 (1.62),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>How to create EPICS device support for a simple serial device</TITLE>
+<META NAME="description" CONTENT="How to create EPICS device support for a simple serial device">
+<META NAME="keywords" CONTENT="tutorial">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002 JA patch-1.4">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="tutorial.css">
+
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<IMG WIDTH="81" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next_inactive" SRC="nx_grp_g.png"> 
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_g.png"> 
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev_g.png">   
+<BR>
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION00010000000000000000">
+Introduction</A>
+</H1>
+This tutorial provides step-by-step instructions on how to create
+EPICS support for a simple serial device.
+The steps are presented in a way that should make it possible to apply
+them in
+cookbook fashion to create support for other serial devices.
+For comprehensive description of all the details of the I/O system
+used here, refer to the
+<A NAME="tex2html2"
+  HREF="../../asynDriver.html">asynDriver</A>
+and
+<A NAME="tex2html3"
+  HREF="../../devGpib.html">devGpib</A>
+documentation.
+
+<P>
+This document isn't for the absolute newcomer though.  You must have
+EPICS installed on a system somewhere and know how
+to build and run the example application.
+In particular you must have the following 
+installed:
+
+<UL>
+<LI>EPICS R3.14.5 or higher
+</LI>
+<LI>An up-to-date version of <TT>modules/asyn</TT>
+</LI>
+</UL>
+Serial devices can now be treated in much the
+same way as GPIB (IEEE-488) devices.
+Current versions of the EPICS asynDriver devGpib module contain
+a special
+'GPIB' driver capable of communicating with devices connected to serial
+ports on the IOC or with devices connected through Ethernet/Serial converter
+boxes.
+
+<P>
+I based this tutorial on the device support I wrote for a
+CVI Laser Corporation AB300 filter wheel.
+You're almost certainly interested in controlling some other device
+so you won't be able to use the information directly.
+I chose the AB300 as the basis for this tutorial since
+the AB300 has a very limited command set, which keeps this document small,
+and yet has commands which raise many
+of the issues that you'll have to consider
+when writing support for other devices.
+
+<P>
+If you'd like to print this tutorial you can download a
+<A NAME="tex2html4"
+  HREF="tutorial.pdf">PDF version</A>.
+
+<H1><A NAME="SECTION00020000000000000000">
+Determine the required I/O operations</A>
+</H1>
+The first order of business is to determine the set of operations the
+device will have to perform.
+A look at the AB300 documentation reveals that there are four
+commands that must be supported.
+Each command will
+be associated with an EPICS process variable (PV) whose type must be
+appropriate to the data transferred by the command.
+The AB300 commands and
+process variable record types I choose to associate with them are shown
+in table&nbsp;<A HREF="#commandList">1</A>.
+<BR><P></P>
+<DIV ALIGN="CENTER">
+
+<DIV ALIGN="CENTER">
+<A NAME="235"></A>
+<TABLE CELLPADDING=3 BORDER="1">
+<CAPTION><STRONG>Table 1:</STRONG>
+AB300 filter wheel commands</CAPTION>
+<TR><TD ALIGN="CENTER" COLSPAN=2><SPAN>CVI Laser Corporation AB300 filter wheel</SPAN></TD>
+</TR>
+<TR><TD ALIGN="CENTER" COLSPAN=1><SPAN>Command</SPAN></TD>
+<TD ALIGN="CENTER" COLSPAN=1><SPAN>EPICS record type</SPAN></TD>
+</TR>
+<TR><TD ALIGN="LEFT">Reset</TD>
+<TD ALIGN="LEFT">longout</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Go to new position</TD>
+<TD ALIGN="LEFT">longout</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Query position</TD>
+<TD ALIGN="LEFT">longin</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Query status</TD>
+<TD ALIGN="LEFT">longin</TD>
+</TR>
+</TABLE>
+</DIV>
+</DIV>
+<BR>
+There are lots of other ways that the AB300 could be handled.  It might
+be useful, for example,  to treat the filter position as
+multi-bit binary records instead.
+
+<P>
+
+<H1><A NAME="SECTION00030000000000000000">
+Create a new application</A>
+</H1>
+Now that the device operations and EPICS process variable types have
+been chosen it's time to create a new EPICS application to provide
+a place to perform subsequent software development.
+The easiest way to do this is with the makeBaseApp.pl script supplied
+with EPICS.
+
+<P>
+Here are the commands I ran.   You'll have to change the
+<TT>/home/EPICS/R3.14.5</TT> to the path to where your EPICS is installed.
+If you're
+not running on Linux you'll also have to change all the <TT>linux-x86</TT> to
+reflect the architecture you're using (<TT>solaris-sparc</TT>, <TT>darwin-ppc</TT>, etc.).
+I built the application as a 'soft' IOC running on the host machine, but
+the serial 'GPIB' driver also works on RTEMS and vxWorks.
+
+<P>
+
+<DIV CLASS="alltt" ALIGN="LEFT">
+<TT>
+ norume&gt; <B> mkdir AB300</B>
+<BR>
+norume&gt; <B> cd AB300</B>
+<BR>
+norume&gt; <B> /home/EPICS/R3.14.5/base/bin/linux-x86/makeBaseApp.pl -t ioc AB300</B>
+<BR>
+norume&gt; <B> /home/EPICS/R3.14.5/base/bin/linux-x86/makeBaseApp.pl -i -t ioc AB300</B>
+<BR>
+The following target architectures are available in base:
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;RTEMS-pc386
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;linux-x86
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;solaris-sparc
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;win32-x86-cygwin
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;vxWorks-ppc603
+<BR>
+What architecture do you want to use? <B> linux-x86</B>
+<BR></TT>
+</DIV>
+
+<P>
+
+<H1><A NAME="SECTION00040000000000000000">
+Make some changes to the files in configure/</A>
+</H1>
+Edit the <TT>configure/RELEASE</TT> file which makeBaseApp.pl created and add an
+entry describing the path to where you installed the EPICS ASYN module:
+
+<DIV CLASS="alltt" ALIGN="LEFT">
+<TT>
+ ASYN=/home/EPICS/R3.14.5/modules/soft/asyn
+<BR></TT>
+</DIV>
+
+<P>
+Edit the <TT>configure/CONFIG</TT> file which makeBaseApp.pl created and specify
+the IOC architectures on which the application is to run.
+I wanted the application to run as a soft IOC, so I uncommented the
+<code>CROSS_COMPILER_TARGET_ARCHS</code> definition and set the definition
+to be empty:
+<PRE>
+CROSS_COMPILER_TARGET_ARCHS =
+</PRE>
+
+<P>
+
+<H1><A NAME="SECTION00050000000000000000">
+Create the device support file</A>
+</H1>
+The contents of the device support
+file provide all the details of the communication between the device
+and EPICS.
+The easiest way to create a device support file is to copy
+the skeleton device support file from the gpibCore module source directory to
+your application source directory:
+
+<DIV CLASS="alltt" ALIGN="LEFT">
+<TT>
+ norume&gt; <B> cd AB300App/src</B>
+<BR>
+norume&gt; <B> cp /usr/EPICS/R3.14.5/modules/soft/asyn/devGpib/devSkeletonGpib.c devAB300.c</B>
+<BR></TT>
+</DIV>
+Of course, device support for a device similar
+to the one you're working with  provides an even easier starting point.
+
+<P>
+The remainder this section describes the changes that I made to the skeleton
+file in order to support the AB300 filter wheel.
+You'll have to modify the steps as appropriate for your device.
+
+<P>
+
+<H2><A NAME="SECTION00051000000000000000">
+Declare the DSET tables provided by the device support</A>
+</H2>
+Since the AB300
+provides only longin and longout records most of the <code>DSET_</code><I>xxx</I>
+define statements can
+be removed.  Because of the way that the device initialization is performed
+you must define an analog-in DSET even if the device provides no analog-in
+records (as is the case for the AB300).
+<PRE>
+#define DSET_AI    devAB300_ai
+#define DSET_LI    devAB300_li
+#define DSET_LO    devAB300_lo
+</PRE>
+
+<P>
+
+<H2><A NAME="SECTION00052000000000000000">
+Select timeout values</A>
+</H2>
+The default value of <code>TIMEWINDOW</code>  (2 seconds) is
+reasonable for the AB300, but I increased the value of <code>TIMEOUT</code> to
+5&nbsp;seconds since the filter wheel can be slow in responding.
+<PRE>
+#define TIMEOUT     5.0
+#define TIMEWINDOW  2.0
+</PRE>
+
+<P>
+
+<H2><A NAME="SECTION00053000000000000000">
+Clean up some unused values</A>
+</H2>
+The skeleton file provides a number of
+character string arrays.  None are needed for the AB300 so I just removed them.
+Not much space would be wasted by just leaving them in place however.
+
+<P>
+
+<H2><A NAME="SECTION00054000000000000000">
+Declare the command array</A>
+</H2>
+This is the hardest part of the job.  Here's where you have to figure
+how to produce the command strings required to control the device
+and how to convert the device responses into EPICS process variable
+values.
+
+<P>
+Each command array entry describes the details of a single
+I/O operation type.
+The application database uses the index of the entry in the command array to
+provide the link between the process variable and the I/O operation to
+read or write that value.
+
+<P>
+The command array entries I created for the AB300 are shown below.  The
+elements of each entry are described using the names from
+the
+<A NAME="tex2html6"
+  HREF="../../devGpib.html">GPIB documentation</A>.
+
+<H3><A NAME="SECTION00054100000000000000">
+Command array index 0 - Device Reset</A>
+</H3>
+<PRE>
+   {&amp;DSET_LO, GPIBWRITE, IB_Q_HIGH, NULL, "\377\377\033", 10, 10,
+       NULL, 0, 0, NULL, NULL, "\033"},
+</PRE>
+<DL>
+<DT><STRONG>dset</STRONG></DT>
+<DD>This command is associated with an longout record.
+</DD>
+<DT><STRONG>type</STRONG></DT>
+<DD>A WRITE operation is to be performed.
+</DD>
+<DT><STRONG>pri</STRONG></DT>
+<DD>This operation should be placed on the high-priority queue
+of I/O requests.
+</DD>
+<DT><STRONG>cmd</STRONG></DT>
+<DD>Because this is a GPIBWRITE operation this element is unused.
+</DD>
+<DT><STRONG>format</STRONG></DT>
+<DD>The format string to generate the command to be sent to the device.  The first two bytes are
+the RESET command, the third byte is the ECHO command.
+The AB300 sends no response to a reset command
+so I send the 'ECHO' to verify that the
+device is responding.  The AB300 resets itself fast enough that it can see an
+echo command immediately following the reset command.
+
+<P>
+Note that the process variable value is not used (there's no printf <code>%</code>
+format character in the command string).  The AB300 is reset whenever the
+EPICS record is processed.
+</DD>
+<DT><STRONG>rspLen</STRONG></DT>
+<DD>The size of the readback buffer.  Although only one readback byte is
+expected I allow for a few extra bytes just in case.
+</DD>
+<DT><STRONG>msgLen</STRONG></DT>
+<DD>The size of the buffer into which the command string is placed.  I allowed
+a little extra space in case a longer command is used some day.
+</DD>
+<DT><STRONG>convert</STRONG></DT>
+<DD>No special conversion function is needed.
+</DD>
+<DT><STRONG>P1,P2,P3</STRONG></DT>
+<DD>There's no special conversion function so no arguments are needed.
+</DD>
+<DT><STRONG>pdevGpibNames</STRONG></DT>
+<DD>There's no name table.
+</DD>
+<DT><STRONG>eos</STRONG></DT>
+<DD>The end-of-string value used to mark the end of the readback operation.
+</DD>
+</DL>
+
+<P>
+
+<H3><A NAME="SECTION00054200000000000000">
+Command array index 1 - Go to new filter position</A>
+</H3>
+<PRE>
+    {&amp;DSET_LO, GPIBWRITE, IB_Q_LOW, NULL, "\017%c", 10, 10,
+        NULL, 0, 0, NULL, NULL, "\030"},
+</PRE>
+<DL>
+<DT><STRONG>dset</STRONG></DT>
+<DD>This command is associated with an longout record.
+</DD>
+<DT><STRONG>type</STRONG></DT>
+<DD>A WRITE operation is to be performed.
+</DD>
+<DT><STRONG>pri</STRONG></DT>
+<DD>This operation should be placed on the high-priority queue
+of I/O requests.
+</DD>
+<DT><STRONG>cmd</STRONG></DT>
+<DD>Because this is a GPIBWRITE operation this element is unused.
+</DD>
+<DT><STRONG>format</STRONG></DT>
+<DD>The format string to generate the command to be sent to the device.
+The filter
+position (1-6) can be converted to the
+required command byte with the printf <code>%c</code> format.
+</DD>
+<DT><STRONG>rspLen</STRONG></DT>
+<DD>The size of the readback buffer.  Although only two readback bytes are
+expected I allow for a few extra bytes just in case.
+</DD>
+<DT><STRONG>msgLen</STRONG></DT>
+<DD>The size of the buffer into which the command string is placed.  I allowed
+a little extra space in case a longer command is used some day.
+</DD>
+<DT><STRONG>convert</STRONG></DT>
+<DD>No special conversion function is needed.
+</DD>
+<DT><STRONG>P1,P2,P3</STRONG></DT>
+<DD>There's no special conversion function so no arguments are needed.
+</DD>
+<DT><STRONG>pdevGpibNames</STRONG></DT>
+<DD>There's no name table.
+</DD>
+<DT><STRONG>eos</STRONG></DT>
+<DD>The end-of-string value used to mark the end of the readback operation.
+</DD>
+</DL>
+
+<P>
+
+<H3><A NAME="SECTION00054300000000000000">
+Command array index 2 - Query filter position</A>
+</H3>
+<PRE>
+    {&amp;DSET_LI, GPIBREAD, IB_Q_LOW, "\035", NULL, 0, 10,
+        convertPositionReply, 0, 0, NULL, NULL, "\030"},
+</PRE>
+<DL>
+<DT><STRONG>dset</STRONG></DT>
+<DD>This command is associated with an longin record.
+</DD>
+<DT><STRONG>type</STRONG></DT>
+<DD>A READ operation is to be performed.
+</DD>
+<DT><STRONG>pri</STRONG></DT>
+<DD>This operation should be placed on the high-priority queue
+of I/O requests.
+</DD>
+<DT><STRONG>cmd</STRONG></DT>
+<DD>The command string to be sent to the device.
+The AB300 responds to this command by sending back three bytes: the current
+position, the controller status, and a terminating <code>'\030'</code>.
+</DD>
+<DT><STRONG>format</STRONG></DT>
+<DD>Because this is a GPIBREAD operation this element is unused.
+</DD>
+<DT><STRONG>rspLen</STRONG></DT>
+<DD>There is no command echo to be read.
+</DD>
+<DT><STRONG>msgLen</STRONG></DT>
+<DD>The size of the buffer into which the reply string is placed. 
+Although only three reply bytes are
+expected I allow for a few extra bytes just in case.
+</DD>
+<DT><STRONG>convert</STRONG></DT>
+<DD>There's no sscanf format that can convert the reply from the
+AB300 so a special conversion function must be provided.
+</DD>
+<DT><STRONG>P1,P2,P3</STRONG></DT>
+<DD>The special conversion function requires no arguments.
+</DD>
+<DT><STRONG>pdevGpibNames</STRONG></DT>
+<DD>There's no name table.
+</DD>
+<DT><STRONG>eos</STRONG></DT>
+<DD>The end-of-string value used to mark the end of the read operation.
+</DD>
+</DL>
+
+<P>
+
+<H3><A NAME="SECTION00054400000000000000">
+Command array index 3 - Query controller status</A>
+</H3>
+This command array entry is almost identical to the previous entry.  The
+only change is that a different custom conversion function is used.
+<PRE>
+    {&amp;DSET_LI, GPIBREAD, IB_Q_LOW, "\035", NULL, 0, 10,
+        convertStatusReply, 0, 0, NULL, NULL, "\030"},
+</PRE>
+
+<P>
+
+<H2><A NAME="SECTION00055000000000000000">
+Write the special conversion functions</A>
+</H2>
+As mentioned above, special conversion functions are need to convert reply
+messages from the AB300 into EPICS PV values.
+The easiest place to put these functions is just before the
+<code>gpibCmds</code> table.
+The conversion functions are passed a pointer to the <code>gpibDpvt</code> structure
+and three values from the command table entry.
+The <code>gpibDpvt</code> structure contains a pointer to the EPICS record.
+The custom conversion function uses this pointer
+to set the record's value field.
+
+<P>
+Here are the custom conversion functions I wrote for the AB300.
+<PRE>
+/*
+ * Custom conversion routines
+ */
+static int
+convertPositionReply(struct gpibDpvt *pdpvt, int P1, int P2, char **P3)
+{
+    struct longinRecord *pli = ((struct longinRecord *)(pdpvt-&gt;precord));
+
+    if (pdpvt-&gt;msgInputLen != 3) {
+        epicsSnprintf(pdpvt-&gt;pasynUser-&gt;errorMessage,
+                      pdpvt-&gt;pasynUser-&gt;errorMessageSize,
+                      "Invalid reply");
+        return -1;
+    }
+    pli-&gt;val = pdpvt-&gt;msg[0];
+    return 0;
+}
+static int
+convertStatusReply(struct gpibDpvt *pdpvt, int P1, int P2, char **P3)
+{
+    struct longinRecord *pli = ((struct longinRecord *)(pdpvt-&gt;precord));
+
+    if (pdpvt-&gt;msgInputLen != 3) {
+        epicsSnprintf(pdpvt-&gt;pasynUser-&gt;errorMessage,
+                      pdpvt-&gt;pasynUser-&gt;errorMessageSize,
+                      "Invalid reply");
+        return -1;
+    }
+    pli-&gt;val = pdpvt-&gt;msg[1];
+    return 0;
+}
+</PRE>
+
+<P>
+Some points of interest:
+
+<OL>
+<LI>The custom conversion function can pass back an error message by printing
+it to the <code>errorMessage</code> buffer.
+</LI>
+<LI>I put in a sanity check to ensure that the end-of-string character is where
+it should be.
+</LI>
+</OL>
+
+<P>
+
+<H2><A NAME="SECTION00056000000000000000">
+Provide the device support initialization</A>
+</H2>
+Because of way code is stored in object libraries on different systems
+the device support parameter table must be initialized at run-time.  The
+analog-in initializer is used to perform this operation.  This is why
+all device support files must declare an analog-in DSET.
+
+<P>
+Here's the initialization for the AB300 device support.  As you can see, most of
+the skeleton file values are left unchanged:
+
+<DIV CLASS="alltt" ALIGN="LEFT">
+<TT>
+ static long init_ai(int parm)
+<BR><code>{</code>
+<BR>&nbsp;&nbsp;if(parm==0) <code>{</code>
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;devSupParms.name = &#34;devAB300&#34;;
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;devSupParms.gpibCmds = gpibCmds;
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;devSupParms.numparams = NUMPARAMS;
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;devSupParms.timeout = TIMEOUT;
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;devSupParms.timeWindow = TIMEWINDOW;
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;devSupParms.respond2Writes = 0;
+<BR>&nbsp;&nbsp;<code>}</code>
+<BR>&nbsp;&nbsp;return(0);
+<BR><code>}</code>
+<BR></TT>
+</DIV>
+Three values have been changed:
+
+<OL>
+<LI>The AB300 sends back values in response to commands, but needs no time delay,
+so the respond2Writes entry is set to 0.
+</LI>
+<LI>The name entry is used for diagnostic purposes only.
+</LI>
+</OL>
+
+<P>
+
+<H1><A NAME="SECTION00060000000000000000">
+Add the device support to the application</A>
+</H1>
+The makeBaseApp.pl script produces an application Makefile
+(<TT>AB300App/src/Makefile</TT>)
+with a commented-out set of application example source files.
+Remove the comment character and change the example names to the
+name of the device support file created in the previous section:
+<PRE>
+AB300_SRCS += devAB300.c
+</PRE>
+
+<P>
+You must also link the GPIB support libraries with your application.  Add the following line
+<PRE>
+AB300_LIBS += asyn
+</PRE>
+before the
+<PRE>
+AB300_LIBS += $(EPICS_BASE_IOC_LIBS)
+</PRE>
+line in the application Makefile.
+
+<P>
+
+<H1><A NAME="SECTION00070000000000000000">
+Modify the application database definition file</A>
+</H1>
+Here's where you specify the link between the DSET names defined in the
+device support file and the DTYP fields in the application database.
+The <TT>AB300App/src/AB300Include.dbd</TT> file created by makeBaseApp.pl needs to
+be changed to include this information.
+I used <code>"AB300Gpib"</code> as the device type.
+
+<P>
+The driver support for serial line 'GPIB' devices must also be included in
+the application as shown.
+
+<P>
+<BR>
+<PRE  CLASS="verbatim">include "base.dbd"
+
+#
+# Define the connection between the DTYP field name and the device DSET tables
+#
+device(longout, GPIB_IO, devAB300_lo, "AB300Gpib")
+device(longin,  GPIB_IO, devAB300_li, "AB300Gpib")
+device(ai,      GPIB_IO, devAB300_ai, "AB300Gpib")
+
+#
+# Pull in the driver support
+#
+include "drvGenericSerial.dbd"
+</PRE>
+<P>
+
+<H1><A NAME="SECTION00080000000000000000">
+Create the application database file</A>
+</H1>
+Now that the application includes the necessary device and driver support 
+it's possible to create the database describing the actual EPICS process
+variables associated with the filter wheel.  
+
+<P>
+I created the file <TT>AB300App/Db/AB300.db</TT> with the following contents:
+<BR>
+<PRE  CLASS="verbatim">record(longout, "$(user):FilterWheel:reset")
+{
+    field(DESC, "Reset AB300 Controller")
+    field(SCAN, "Passive")
+    field(DTYP, "AB300Gpib")
+    field(OUT,  "#L0 A0 @0")
+}
+record(longout, "$(user):FilterWheel")
+{
+    field(DESC, "Set Filter Wheel Position")
+    field(SCAN, "Passive")
+    field(DTYP, "AB300Gpib")
+    field(OUT,  "#L0 A0 @1")
+    field(LOPR, 1)
+    field(HOPR, 6)
+}
+record(longin, "$(user):FilterWheel:fbk")
+{
+    field(DESC, "Filter Wheel Position")
+    field(SCAN, "Passive")
+    field(DTYP, "AB300Gpib")
+    field(INP,  "#L0 A0 @2")
+    field(LOPR, 1)
+    field(HOPR, 6)
+}
+record(longin, "$(user):FilterWheel:status")
+{
+    field(DESC, "Filter Wheel Status")
+    field(SCAN, "Passive")
+    field(DTYP, "AB300Gpib")
+    field(INP,  "#L0 A0 @3")
+}
+</PRE>Notes:
+
+<OL>
+<LI>The numbers following the <code>L</code> in
+the INP and OUT fields are the 
+number of the `link' used to communicate with the filter wheel.  This
+link is set up at run time by commands in the application startup script.
+</LI>
+<LI>The numbers following the <code>A</code> in
+the INP and OUT fields are unused by the device support but must be
+a valid GPIB address (0-30) since the GPIB address conversion routines
+check the value and the diagnostic display routines require a matching value.
+</LI>
+<LI>The numbers following the <code>@</code> in
+the INP and OUT fields are the 
+indices into the GPIB command array.
+</LI>
+<LI>The DTYP fields must match the names specified in the AB300Include.dbd
+database definition.
+</LI>
+</OL>
+
+<P>
+
+<H1><A NAME="SECTION00090000000000000000">
+Add the database file to the application</A>
+</H1>
+The makeBaseApp.pl script put and exampl application database file
+into <TT>AB300App/Db/Makefile</TT> as a comment.  
+Replace the example name with the name of the database file created in the
+previous step, leaving:
+<PRE>
+DB += AB300.db
+</PRE>
+
+<P>
+
+<H1><A NAME="SECTION000100000000000000000">
+Modify the application startup script</A>
+</H1>
+The <TT>iocBoot/iocAB300/st.cmd</TT> application startup script created by the
+makeBaseApp.pl script needs a few changes to get the application 
+working properly.
+
+<P>
+
+<OL>
+<LI>Ensure that the application database records are loaded.  Remove the
+<code>#</code>
+and give a reasonable value to the 'user' macro:
+<PRE>
+dbLoadRecords("../../db/AB300.db","user=AB300")
+</PRE>
+
+<P>
+</LI>
+<LI>Set up the 'link' between the IOC and the filter wheel.
+
+<UL>
+<LI>If you're using
+an Ethernet/RS-232 converter or a device which communicates over
+a telnet-style socket connection you need to specify the Internet host and
+port number like:
+<PRE>
+drvGenericSerialConfigure("L0","164.54.9.91:4002",0,0)
+</PRE>
+
+<P>
+</LI>
+<LI>If you're using a serial line directly attached to the IOC you need
+something like:
+<PRE>
+drvGenericSerialConfigure("L0","/dev/ttyS0",0,0)
+asynSetPortOption("L0", "baud", "9600")
+asynSetPortOption("L0", "bits", "8")
+asynSetPortOption("L0", "parity", "none")
+asynSetPortOption("L0", "stop", "1")
+asynSetPortOption("L0", "clocal", "Y")
+asynSetPortOption("L0", "crtscts", "N")
+</PRE>
+
+<P>
+</LI>
+<LI>If you're using a serial line directly attached to a vxWorks IOC you must
+first configure the serial port interface hardware.  The following example shows the
+commands to configure a port on a GreenSprings UART Industry-Pack module.
+<PRE>
+ipacAddVIPC616_01("0x6000,B0000000")
+tyGSOctalDrv(1)
+tyGSOctalModuleInit("RS232", 0x80, 0, 0)
+tyGSOctalDevCreate("/tyGS/0/0",0,0,1000,1000)
+drvGenericSerialConfigure("L0","/tyGS/0/0",0,0)
+asynSetPortOption("L0","baud","9600")
+</PRE>
+</LI>
+</UL>
+
+<P>
+In all of the above examples the first argument of the
+drvGenericSerialConfigure and asynSetPortOption commands is
+the link identifier and must match the <code>L</code> value in the EPICS
+database record INP and OUT fields.
+
+<P>
+</LI>
+<LI>(Optional) Add lines to control the debugging level of the serial line 'GPIB' driver.
+The following turns on full tracing of control flow and every I/O operation
+which is useful during initial debugging.
+<PRE>
+asynSetTraceMask("L0",0,0xff)
+asynSetTraceIOMask("L0",0,0x2)
+</PRE>
+A better way to control the amount and type of diagnostic output is through
+the use of the
+<A NAME="tex2html7"
+  HREF="../../asynDriver.html#DiagnosticAids">asynTrace</A>
+facility.
+
+<P>
+</LI>
+</OL>
+
+<P>
+
+<H1><A NAME="SECTION000110000000000000000">
+Build the application</A>
+</H1>
+Change directories to the top-level directory of your application and:
+
+<DIV CLASS="alltt" ALIGN="LEFT">
+<TT>
+ norume&gt; <B> make</B>
+<BR></TT>
+</DIV>
+
+(<B>gmake</B> on solaris).
+
+<P>
+If all goes well you'll be left with an executable program in
+<TT>bin/linux-x86/AB300</TT>.
+
+<P>
+
+<H1><A NAME="SECTION000120000000000000000">
+Run the application</A>
+</H1>
+Change directories to where makeBaseApp.pl put the application startup script
+and run the application:
+
+<DIV CLASS="alltt" ALIGN="LEFT">
+<TT>
+ norume&gt; <B> cd iocBoot/iocAB300</B>
+<BR>
+norume&gt; <B> ../../bin/linux-x86/AB300 st.cmd</B>
+<BR>
+dbLoadDatabase(&#34;../../dbd/AB300.dbd&#34;,0,0)
+<BR>
+AB300_registerRecordDeviceDriver(pdbbase) 
+<BR>
+dbLoadRecords(&#34;../../db/AB300.db&#34;,&#34;user=AB300&#34;)
+<BR>
+drvGenericSerialConfigure(&#34;L0&#34;,&#34;164.54.9.91:4002&#34;,0,0)
+<BR>
+asynSetTraceMask(&#34;L0&#34;,0,0xff)
+<BR>
+asynSetTraceIOMask(&#34;L0&#34;,0,0x2)
+<BR>
+iocInit()
+<BR>############################################################################
+<BR>### &nbsp;EPICS IOC CORE built on Jan 29 2004
+<BR>### &nbsp;EPICS R3.14.5 $R1-2$ $2004/02/13 20:04:36$
+<BR>############################################################################
+<BR>
+Starting iocInit
+<BR>
+iocInit: All initialization complete
+<BR>
+epics&gt;
+<BR></TT>
+</DIV>
+
+<P>
+Check the process variable names:
+
+<DIV CLASS="alltt" ALIGN="LEFT">
+<TT>
+ epics&gt; <B> dbl</B>
+<BR>
+AB300:FilterWheel:fbk
+<BR>
+AB300:FilterWheel:status
+<BR>
+AB300:FilterWheel
+<BR>
+AB300:FilterWheel:reset
+<BR></TT>
+</DIV>
+
+<P>
+Reset the filter wheel.  The values sent between the IOC and the filter wheel
+are shown:
+
+<DIV CLASS="alltt" ALIGN="LEFT">
+<TT>
+ epics&gt; <B> dbpf AB300:FilterWheel:reset 0</B>
+<BR>
+DBR_LONG: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0x0 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<BR>
+drvGenericSerial set eos 1 <code>\</code>033
+<BR>
+drvGenericSerialWrite 3 <code>\</code>377<code>\</code>377<code>\</code>033
+<BR>
+drvGenericSerialRead 1 <code>\</code>033
+<BR></TT>
+</DIV>
+
+<P>
+Read back the filter wheel position.  The dbtr command prints the record
+before the I/O has a chance to occur:
+
+<DIV CLASS="alltt" ALIGN="LEFT">
+<TT>
+ epics&gt; <B> dbtr AB300:FilterWheel:fbk</B>
+<BR>
+ACKS: NO_ALARM &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ACKT: YES &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ADEL: 0 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ALST: 0
+<BR>
+ASG: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BKPT: 0x00 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DESC: Filter Wheel Position
+<BR>
+DISA: 0 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DISP: 0 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DISS: NO_ALARM &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DISV: 1
+<BR>
+DTYP: AB300Gpib &nbsp;&nbsp;&nbsp;&nbsp;EGU: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EVNT: 0 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FLNK:CONSTANT 0
+<BR>
+HHSV: NO_ALARM &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;HIGH: 0 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;HIHI: 0 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;HOPR: 6
+<BR>
+HSV: NO_ALARM &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;HYST: 0 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;INP:GPIB_IO #L0 A0 @2
+<BR>
+LALM: 0 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LCNT: 0 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LLSV: NO_ALARM &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LOLO: 0
+<BR>
+LOPR: 1 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LOW: 0 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LSV: NO_ALARM &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MDEL: 0
+<BR>
+MLST: 0 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NAME: AB300:FilterWheel:fbk &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NSEV: NO_ALARM
+<BR>
+NSTA: NO_ALARM &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PACT: 1 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PHAS: 0 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PINI: NO
+<BR>
+PRIO: LOW &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PROC: 0 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PUTF: 0 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RPRO: 0
+<BR>
+SCAN: Passive &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SDIS:CONSTANT &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SEVR: INVALID &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SIML:CONSTANT
+<BR>
+SIMM: NO &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SIMS: NO_ALARM &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SIOL:CONSTANT &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;STAT: UDF
+<BR>
+SVAL: 0 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TPRO: 0 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TSE: 0 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TSEL:CONSTANT
+<BR>
+UDF: 1 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;VAL: 0
+<BR>
+drvGenericSerial set eos 1 <code>\</code>030
+<BR>
+drvGenericSerialWrite 1 <code>\</code>035
+<BR>
+drvGenericSerialRead 3 <code>\</code>001<code>\</code>020<code>\</code>030
+<BR></TT>
+</DIV>
+
+<P>
+Now the process variable should have that value:
+
+<DIV CLASS="alltt" ALIGN="LEFT">
+<TT>
+ epics&gt; <B> dbpr AB300:FilterWheel:fbk</B>
+<BR>
+ASG: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DESC: Filter Wheel Position &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DISA: 0
+<BR>
+DISP: 0 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DISV: 1 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NAME: AB300:FilterWheel:fbk
+<BR>
+SEVR: NO_ALARM &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;STAT: NO_ALARM &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SVAL: 0 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TPRO: 0
+<BR>
+VAL: 1
+<BR></TT>
+</DIV>
+
+<P>
+Move the wheel to position 4:
+
+<P>
+
+<DIV CLASS="alltt" ALIGN="LEFT">
+<TT>
+ epics&gt; <B> dbpf AB300:FilterWheel 4</B>
+<BR>
+DBR_LONG: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0x4
+<BR>
+drvGenericSerialWrite 2 <code>\</code>017<code>\</code>004
+<BR>
+drvGenericSerialRead 1 <code>\</code>020
+<BR>
+drvGenericSerialRead 1 <code>\</code>030
+<BR></TT>
+</DIV>
+
+<P>
+Read back the position:
+
+<DIV CLASS="alltt" ALIGN="LEFT">
+<TT>
+ epics&gt; <B> dbtr AB300:FilterWheel:fbk</B>
+<BR>
+ACKS: NO_ALARM &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ACKT: YES &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ADEL: 0 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ALST: 1
+<BR>
+ASG: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BKPT: 0x00 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DESC: Filter Wheel Position
+<BR>
+DISA: 0 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DISP: 0 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DISS: NO_ALARM &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DISV: 1
+<BR>
+DTYP: AB300Gpib &nbsp;&nbsp;&nbsp;&nbsp;EGU: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EVNT: 0 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FLNK:CONSTANT 0
+<BR>
+HHSV: NO_ALARM &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;HIGH: 0 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;HIHI: 0 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;HOPR: 6
+<BR>
+HSV: NO_ALARM &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;HYST: 0 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;INP:GPIB_IO #L0 A0 @2
+<BR>
+LALM: 1 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LCNT: 0 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LLSV: NO_ALARM &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LOLO: 0
+<BR>
+LOPR: 1 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LOW: 0 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LSV: NO_ALARM &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MDEL: 0
+<BR>
+MLST: 1 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NAME: AB300:FilterWheel:fbk &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NSEV: NO_ALARM
+<BR>
+NSTA: NO_ALARM &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PACT: 1 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PHAS: 0 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PINI: NO
+<BR>
+PRIO: LOW &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PROC: 0 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PUTF: 0 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RPRO: 0
+<BR>
+SCAN: Passive &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SDIS:CONSTANT &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SEVR: NO_ALARM &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SIML:CONSTANT
+<BR>
+SIMM: NO &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SIMS: NO_ALARM &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SIOL:CONSTANT &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;STAT: NO_ALARM
+<BR>
+SVAL: 0 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TPRO: 0 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TSE: 0 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TSEL:CONSTANT
+<BR>
+UDF: 0 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;VAL: 1
+<BR>
+drvGenericSerialWrite 1 <code>\</code>035
+<BR>
+drvGenericSerialRead 3 <code>\</code>004<code>\</code>020<code>\</code>030
+<BR></TT>
+</DIV>
+
+<P>
+And it really is 4:
+
+<DIV CLASS="alltt" ALIGN="LEFT">
+<TT>
+ epics&gt; <B> dbpr AB300:FilterWheel:fbk</B>
+<BR>
+ASG: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DESC: Filter Wheel Position &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DISA: 0
+<BR>
+DISP: 0 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DISV: 1 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NAME: AB300:FilterWheel:fbk
+<BR>
+SEVR: NO_ALARM &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;STAT: NO_ALARM &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SVAL: 0 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TPRO: 0
+<BR>
+VAL: 4
+<BR></TT>
+</DIV>
+
+<P>
+
+<H1><A NAME="SECTION000130000000000000000">
+Device Support File</A>
+</H1>
+Here is the complete device support file for the AB300 filter wheel
+(<TT>AB300App/src/devAB300.c</TT>):
+<BR>
+<PRE  CLASS="verbatim">/*************************************************************************\
+* Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+*     National Laboratory.
+* Copyright (c) 2002 The Regents of the University of California, as
+*     Operator of Los Alamos National Laboratory.
+* EPICS BASE Versions 3.13.7
+* and higher are distributed subject to a Software License Agreement found
+* in file LICENSE that is included with this distribution. 
+\*************************************************************************/
+/* devAB300.c,v 1.3 2004/01/30 17:26:32 norume Exp */
+#include &lt;epicsStdio.h&gt;
+#include &lt;devCommonGpib.h&gt;
+
+
+/******************************************************************************
+ *
+ * The following define statements are used to declare the names to be used
+ * for the dset tables.   
+ *
+ * A DSET_AI entry must be declared here and referenced in an application
+ * database description file even if the device provides no AI records.
+ *
+ ******************************************************************************/
+#define DSET_AI     devAB300_ai
+#define DSET_LI     devAB300_li
+#define DSET_LO     devAB300_lo
+
+#include &lt;devGpib.h&gt; /* must be included after DSET defines */
+
+
+#define TIMEWINDOW 2.0       /* wait 2 seconds after device timeout */
+#define TIMEOUT    5.0       /* I/O must complete within 5 seconds */
+
+
+/*
+ * Custom conversion routines
+ */
+static int
+convertPositionReply(struct gpibDpvt *pdpvt, int P1, int P2, char **P3)
+{
+    struct longinRecord *pli = ((struct longinRecord *)(pdpvt-&gt;precord));
+
+    if (pdpvt-&gt;msgInputLen != 3) {
+        epicsSnprintf(pdpvt-&gt;pasynUser-&gt;errorMessage,
+                      pdpvt-&gt;pasynUser-&gt;errorMessageSize,
+                      "Invalid reply");
+        return -1;
+    }
+    pli-&gt;val = pdpvt-&gt;msg[0];
+    return 0;
+}
+static int
+convertStatusReply(struct gpibDpvt *pdpvt, int P1, int P2, char **P3)
+{
+    struct longinRecord *pli = ((struct longinRecord *)(pdpvt-&gt;precord));
+
+    if (pdpvt-&gt;msgInputLen != 3) {
+        epicsSnprintf(pdpvt-&gt;pasynUser-&gt;errorMessage,
+                      pdpvt-&gt;pasynUser-&gt;errorMessageSize,
+                      "Invalid reply");
+        return -1;
+    }
+    pli-&gt;val = pdpvt-&gt;msg[1];
+    return 0;
+}
+
+/******************************************************************************
+ *
+ * Array of structures that define all GPIB messages
+ * supported for this type of instrument.
+ *
+ ******************************************************************************/
+
+static struct gpibCmd gpibCmds[] = {
+    /* Param 0 -- Device Reset */
+    {&amp;DSET_LO, GPIBWRITE, IB_Q_HIGH, NULL, "\377\377\033", 10, 10,
+        NULL, 0, 0, NULL, NULL, "\033"},
+
+    /* Param 1 -- Go to new filter position */
+    {&amp;DSET_LO, GPIBWRITE, IB_Q_LOW, NULL, "\017%c", 10, 10,
+        NULL, 0, 0, NULL, NULL, "\030"},
+
+    /* Param 2 -- Query filter position */
+    {&amp;DSET_LI, GPIBREAD, IB_Q_LOW, "\035", NULL, 0, 10,
+        convertPositionReply, 0, 0, NULL, NULL, "\030"},
+
+    /* Param 3 -- Query controller status */
+    {&amp;DSET_LI, GPIBREAD, IB_Q_LOW, "\035", NULL, 0, 10,
+        convertStatusReply, 0, 0, NULL, NULL, "\030"}
+};
+
+/* The following is the number of elements in the command array above.  */
+#define NUMPARAMS        sizeof(gpibCmds)/sizeof(struct gpibCmd)
+
+/******************************************************************************
+ *
+ * Initialize device support parameters
+ *
+ *****************************************************************************/
+static long init_ai(int parm)
+{
+  if(parm==0)  {
+    devSupParms.name = "devAB300";
+    devSupParms.gpibCmds = gpibCmds;
+    devSupParms.numparams = NUMPARAMS;
+    devSupParms.timeout = TIMEOUT;
+    devSupParms.timeWindow = TIMEWINDOW;
+    devSupParms.respond2Writes = 0;
+  }
+  return(0);
+}
+</PRE>
+<P>
+
+<H1><A NAME="SECTION000140000000000000000">
+asynTrace support</A>
+</H1>
+The asynTrace facility provides a convenient mechanism for controlling
+the diagnostic messages produced by asyn drivers.  To add asynTrace
+to your application:
+
+<OL>
+<LI>Add the line
+<PRE>
+include "devAsynTrace.dbd"
+</PRE>
+to the application <I>xxx</I><TT>Include.dbd</TT> file.
+
+<P>
+</LI>
+<LI>Add the line
+<PRE>
+DB_INSTALLS += $(ASYN)/db/asynTrace.db
+</PRE>
+to an application <TT>Makefile</TT>.
+
+<P>
+</LI>
+<LI>For each port on which you wish to control diagnostic messages,
+add a line like
+<PRE>
+dbLoadRecords("db/asynTrace.db","ioc=ab300Test,port=L0,addr=0")
+</PRE>
+to the application startup (<TT>st.cmd</TT>) script.
+The <TT>port</TT> value must match the the value in the corresponding
+<TT>drvGenericSerialConfigure</TT> command. The <TT>addr</TT> value should be zero.
+The <TT>ioc</TT> value is arbitrary and should be chosen so that the ioc/port/addr
+combination is unique among all IOCs on your network.
+</LI>
+</OL>
+
+<P>
+To run the asynTrace screen, add <I><SPAN CLASS="MATH"><IMG
+ WIDTH="16" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img1.png"
+ ALT="$&lt;$"></SPAN>asynTop<SPAN CLASS="MATH"><IMG
+ WIDTH="16" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img2.png"
+ ALT="$&gt;$"></SPAN></I><TT>/medm</TT> to your
+<code>EPICS_DISPLAY_PATH</code> environment variable and start medm with
+<TT>ioc</TT>, <TT>port</TT> and <TT>addr</TT> values
+matching those given in the <TT>dbLoadRecords</TT> command:
+<PRE>
+medm -x -macro "ioc=ab300Test,port=L0,addr=0" asynTrace.adl &amp;
+</PRE>
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<IMG WIDTH="81" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next_inactive" SRC="nx_grp_g.png"> 
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_g.png"> 
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev_g.png">   
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>

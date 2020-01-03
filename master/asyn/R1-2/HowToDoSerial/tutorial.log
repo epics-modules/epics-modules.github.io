@@ -1,0 +1,76 @@
+This is TeX, Version 3.14159 (Web2C 7.2) (format=latex 1999.11.4)  19 FEB 2004 09:50
+**tutorial.tex
+(tutorial.tex
+LaTeX2e <1998/06/01>
+(/opt/local/share/texmf/tex/latex/base/article.cls
+Document Class: article 1998/05/05 v1.3y Standard LaTeX document class
+(/opt/local/share/texmf/tex/latex/base/size10.clo
+File: size10.clo 1998/05/05 v1.3y Standard LaTeX file (size option)
+)
+\c@part=\count79
+\c@section=\count80
+\c@subsection=\count81
+\c@subsubsection=\count82
+\c@paragraph=\count83
+\c@subparagraph=\count84
+\c@figure=\count85
+\c@table=\count86
+\abovecaptionskip=\skip41
+\belowcaptionskip=\skip42
+\bibindent=\dimen102
+)
+(/opt/local/share/texmf/tex/latex/graphics/epsfig.sty
+Package: epsfig 1996/10/04 v1.7 (e)psfig emulation (SPQR)
+
+(/opt/local/share/texmf/tex/latex/graphics/graphicx.sty
+Package: graphicx 1997/06/09 v1.0d Enhanced LaTeX Graphics (DPC,SPQR)
+
+(/opt/local/share/texmf/tex/latex/graphics/keyval.sty
+Package: keyval 1998/06/05 v1.11 key=value parser (DPC)
+\KV@toks@=\toks14
+)
+(/opt/local/share/texmf/tex/latex/graphics/graphics.sty
+Package: graphics 1998/05/27 v1.0h Standard LaTeX Graphics (DPC,SPQR)
+
+(/opt/local/share/texmf/tex/latex/graphics/trig.sty
+Package: trig 1994/10/16 v1.08 sin cos tan (DPC)
+)
+(/opt/local/share/texmf/tex/latex/config/graphics.cfg)
+Package graphics Info: Driver file: dvips.def on input line 85.
+
+(/opt/local/share/texmf/tex/latex/graphics/dvips.def
+File: dvips.def 1998/05/03 v3.0f Driver-dependant file (DPC,SPQR)
+))
+\Gin@req@height=\dimen103
+\Gin@req@width=\dimen104
+)
+\epsfxsize=\dimen105
+\epsfysize=\dimen106
+)
+(/opt/local/share/texmf/tex/latex/adobe/times.sty
+Package: times 1998/01/07 PSNFSS v.7 Times font as default roman : S Rahtz
+)
+
+! LaTeX Error: File `html.sty' not found.
+
+Type X to quit or <RETURN> to proceed,
+or enter new name. (Default extension: sty)
+
+Enter file name: 
+! Emergency stop.
+<read *> 
+         
+l.6 \usepackage
+               {alltt}^^M
+End of file on the terminal!
+
+ 
+Here is how much of TeX's memory you used:
+ 522 strings out of 10978
+ 5793 string characters out of 73653
+ 50264 words of memory out of 263001
+ 3451 multiletter control sequences out of 10000+0
+ 3640 words of font info for 14 fonts, out of 200000 for 1000
+ 14 hyphenation exceptions out of 1000
+ 32i,0n,21p,218b,40s stack positions out of 300i,100n,500p,30000b,4000s
+No pages of output.
