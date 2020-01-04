@@ -1,5 +1,5 @@
 epics-modules
-============
+=============
 
 EPICS Support for beamline applications
 ---------------------------------------
@@ -16,6 +16,6 @@ Contents
 
    Readme <readme>
    License <https://www.aps.anl.gov/BCDA/synApps-license>
-   synApps modules <modules>
+   asyn <https://epics-modules.github.io/master/asyn>
 
 
