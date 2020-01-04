@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Dante &#8212; EPICS Modules b8b3a95 documentation</title>
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
+    <link rel="shortcut icon" href="../_static/favicon_t.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html">
+          epics-modules</a>
+        <span class="navbar-text navbar-version pull-left"><b>b8b3a95</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../readme.html">Readme</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../readme.html#download-the-synapps-modules">Download the synApps modules</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="https://www.aps.anl.gov/BCDA/synApps-license">License</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://epics-modules.github.io/master/asyn">asyn</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">Dante</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#system-controls">System controls</a></li>
+<li><a class="reference internal" href="#configuration-parameters">Configuration parameters</a></li>
+<li><a class="reference internal" href="#run-time-statistics">Run-time statistics</a></li>
+<li><a class="reference internal" href="#mca-mode">MCA mode</a></li>
+<li><a class="reference internal" href="#mca-mapping-mode">MCA mapping mode</a></li>
+<li><a class="reference internal" href="#list-mode">List mode</a></li>
+<li><a class="reference internal" href="#adc-trace-waveforms">ADC trace waveforms</a></li>
+<li><a class="reference internal" href="#ioc-startup-script">IOC startup script</a></li>
+<li><a class="reference internal" href="#known-problems">Known problems</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+              
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="../_sources/source/index.rst.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <div class="section" id="dante">
+<h1><a class="toc-backref" href="#id2">Dante</a><a class="headerlink" href="#dante" title="Permalink to this headline">¶</a></h1>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">author:</th><td class="field-body">Mark Rivers, University of Chicago</td>
+</tr>
+</tbody>
+</table>
+<div class="contents topic" id="contents">
+<p class="topic-title first">Contents</p>
+<ul class="simple">
+<li><a class="reference internal" href="#dante" id="id2">Dante</a><ul>
+<li><a class="reference internal" href="#overview" id="id3">Overview</a></li>
+<li><a class="reference internal" href="#system-controls" id="id4">System controls</a></li>
+<li><a class="reference internal" href="#configuration-parameters" id="id5">Configuration parameters</a></li>
+<li><a class="reference internal" href="#run-time-statistics" id="id6">Run-time statistics</a></li>
+<li><a class="reference internal" href="#mca-mode" id="id7">MCA mode</a></li>
+<li><a class="reference internal" href="#mca-mapping-mode" id="id8">MCA mapping mode</a></li>
+<li><a class="reference internal" href="#list-mode" id="id9">List mode</a></li>
+<li><a class="reference internal" href="#adc-trace-waveforms" id="id10">ADC trace waveforms</a></li>
+<li><a class="reference internal" href="#ioc-startup-script" id="id11">IOC startup script</a></li>
+<li><a class="reference internal" href="#known-problems" id="id12">Known problems</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="overview">
+<h2><a class="toc-backref" href="#id3">Overview</a><a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>This is an EPICS driver for the <a class="reference external" href="https://www.xglab.it">XGLab</a> Dante digital x-ray spectroscopy system.
+The Dante is available in single channel and 8-channel versions
+This module is intended to work with either, though it has currently only been tested on the single-channel version.
+In this document NumBoards refers to the number of input channels, e.g 1 for a single-channel Dante and 8 for an
+8-channel Dante.</p>
+<p>The Dante can collect data in 3 different modes:</p>
+<ul class="simple">
+<li>Single MCA spectrum.  It acquires a single MCA spectrum on all channels.</li>
+<li>MCA mapping mode.  It acquires multiple spectra in rapid succession, and it often used for making an x-ray map where there is an MCA
+spectrum for each channel at each pixel.  The advance to the next pixel can come from an internal clock or an external trigger.</li>
+<li>List mapping mode.  It acquires each x-ray event energy and timestamp in a list buffer.</li>
+</ul>
+<p>The Dante driver is derived from the base class <a class="reference external" href="https://areadetector.github.io/master/ADCore/NDArray.html#asynndarraydriver">asynNDArrayDriver</a>, which is part of the EPICS <a class="reference external" href="https://areadetector.github.io">areaDetector</a> package.
+The allows the Dante driver to use all of the areaDetector plugins for file saving in MCA mapping and list modes,
+and for other purposes. It also implements the mca interface from the EPICS <a class="reference external" href="https://github.com/epics-modules/mca">mca</a> module.
+The EPICS mca record can be used to display the spectra and control the basic operation including Regions-of-Interest (ROIs).</p>
+<p>The Dante driver can be used on both Windows and Linux. A Windows machine with a USB interface is currently required
+to load new firmware.  Otherwise the module can be used from either Linux or Windows over Ethernet. Currently XGLab only
+provides the Linux library built with the version of gcc on Ubuntu 18.  This means it cannot be used on RHEL7 or Centos7, for
+example.  However, they are planning to release a build done with an older compiler that with run on RHEL7/Centos7 soon.</p>
+<p>This document does not attempt to give an explanation of the principles of operation of the Dante, or a detailed explanation
+of the many configuration parameters for the digital pulse processing.  The user should consult the
+<a class="reference download internal" download="" href="../_downloads/3c4fb95bad49be7be27522b65f40de26/DANTE-4552 Manual Rev 2.9.pdf"><code class="xref download docutils literal notranslate"><span class="pre">DanteManual</span></code></a> for this information.</p>
+</div>
+<div class="section" id="system-controls">
+<h2><a class="toc-backref" href="#id4">System controls</a><a class="headerlink" href="#system-controls" title="Permalink to this headline">¶</a></h2>
+<p>These records are in the file <code class="docutils literal notranslate"><span class="pre">dante.template</span></code>. This database is loaded once for the Dante system.  It provides
+control of the system-wide settings for the system.</p>
+<table border="1" class="colwidths-auto table-bordered table-striped table-hover docutils">
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">EPICS record names</th>
+<th class="head">Record types</th>
+<th class="head">drvInfo string</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>CollectMode, CollectMode_RBV</td>
+<td>mbbo, mbbi</td>
+<td>DanteCollectMode</td>
+<td>Controls the data collection mode.
+Choices are “MCA” (0), “MCA Mapping” (1) and “List” (2).</td>
+</tr>
+<tr class="row-odd"><td>GatingMode, GatingMode_RBV</td>
+<td>mbbo, mbbi</td>
+<td>DanteGatingMode</td>
+<td>Controls the gating mode.
+Choices are “Free running” (0), “Trig rising” (1), “Trig falling” (2), “Trig both” (3), “Gate high” (4), “Gate low” (5).</td>
+</tr>
+<tr class="row-even"><td>NumMCAChannels, NumMCAChannels_RBV</td>
+<td>mbbo, mbbi</td>
+<td>MCA_NUM_CHANNELS</td>
+<td>The number of MCA channels to use.  Choices are 1024, 2048, 4096.</td>
+</tr>
+<tr class="row-odd"><td>PollTime, PollTime_RBV</td>
+<td>ao, ai</td>
+<td>DantePollTime</td>
+<td>The time between polls when reading completion status, MCA mapping data, and list mode data from the driver.
+0.01 second is a reasonable value that will provide good response and resource utilization.</td>
+</tr>
+<tr class="row-even"><td>PresetReal</td>
+<td>ao</td>
+<td>MCA_PRESET_REAL</td>
+<td>Sets the preset real time.  Set this to 0 to count forever in MCA mode or List mode.</td>
+</tr>
+<tr class="row-odd"><td>EraseStart</td>
+<td>bo</td>
+<td>N.A.</td>
+<td>Processing this record starts acquisition for all boards in the selected CollectMode.</td>
+</tr>
+<tr class="row-even"><td>StartAll</td>
+<td>bo</td>
+<td>MCA_START_ACQUIRE</td>
+<td>Processing this record starts acquisition for all boards in the selected CollectMode. This record should not
+be used by higher-level software, it is processed by EraseStart.</td>
+</tr>
+<tr class="row-odd"><td>MCAAcquireBusy</td>
+<td>busy</td>
+<td>N.A.</td>
+<td>This record goes to 1 (“Collecting”) when EraseStart is processed. It goes back to 0 (“Done”)when 3 conditions
+are satisfied. 1) MCAAcquiring is 0; 2) All MCA records have .ACQG field=0; 3)AcquireBusy from areaDetector=0.
+The last condition can ensure that all plugins are done processing if WaitForPlugins is set.</td>
+</tr>
+<tr class="row-even"><td>MCAAcquiring</td>
+<td>bi</td>
+<td>MCA_ACQUIRING</td>
+<td>This record is 1 when the Dante driver itself is acquiring, and 0 when it is done. This record is generally not used
+by higher level software, use MCAAcquireBusy instead, since it indicates when all components are done.</td>
+</tr>
+<tr class="row-odd"><td>StopAll</td>
+<td>bo</td>
+<td>MCA_STOP_ACQUIRE</td>
+<td>Processing this record stops acquisition for all boards in the selected CollectMode. This only needs to be used
+to terminate acquisition before it would otherwise stop because PresetReal or NumMappingPoints have been reached.</td>
+</tr>
+<tr class="row-even"><td>ReadAll</td>
+<td>bo</td>
+<td>N.A.</td>
+<td>Processing this record reads the MCA data and statistics for all boards.  This .SCAN field of this record is typically
+set to periodic, i.e. “1 second”, “.1 second”, etc. to provide user feedback while acquisition is in progress.
+It can be set to “Passive” and the system will still read the data once when acquisition completes.
+This can be used to improve performance at very short PresetReal times.
+This record is disabled when acquisition is complete to reduce unneeded resource usage.</td>
+</tr>
+<tr class="row-odd"><td>ReadAllOnce</td>
+<td>bo</td>
+<td>N.A.</td>
+<td>Processing this record reads the MCA data and statistics for all boards.  This record is processed by ReadAll. It can be
+manually processed to read the data even when acquisition is complete.</td>
+</tr>
+<tr class="row-even"><td>ElapsedReal</td>
+<td>ai</td>
+<td>MCA_ELAPSED_REAL</td>
+<td>The elapsed real time.</td>
+</tr>
+<tr class="row-odd"><td>ElapsedLive</td>
+<td>ai</td>
+<td>MCA_ELAPSED_LIVE</td>
+<td>The elapsed live time.</td>
+</tr>
+<tr class="row-even"><td>DeadTime</td>
+<td>ai</td>
+<td>DanteDeadTime</td>
+<td>The cummulative deadtime.</td>
+</tr>
+<tr class="row-odd"><td>IDeadTime</td>
+<td>ai</td>
+<td>DanteIDeadTime</td>
+<td>The “instantaneous” deadtime since the previous readout.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="configuration-parameters">
+<h2><a class="toc-backref" href="#id5">Configuration parameters</a><a class="headerlink" href="#configuration-parameters" title="Permalink to this headline">¶</a></h2>
+<p>These records control the configuration of the digital signal processing. The readback (_RBV) values may differ slightly
+from the output values because of the discrete nature of the system clocks and MCA bins.</p>
+<p>These parameters are specific to a single board, and are contained in DanteN.template.</p>
+<table border="1" class="colwidths-auto table-bordered table-striped table-hover docutils">
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">EPICS record names</th>
+<th class="head">Record types</th>
+<th class="head">drvInfo string</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>MaxEnergy, MaxEnergy_RBV</td>
+<td>ao, ai</td>
+<td>DanteMaxEnergy</td>
+<td>The actual energy of the last channel.  The user must provide this value based on the energy calibration.
+It is used to provide meaningful units for FastThreshold, EnergyThreshold, and BaselineThreshold.</td>
+</tr>
+<tr class="row-odd"><td>InputPolarity, InputPolarity_RBV</td>
+<td>bo, bi</td>
+<td>DanteInvertedInput</td>
+<td>The pre-amp output polarity. Choices are “Pos.” (0) and “Neg.” (1).</td>
+</tr>
+<tr class="row-even"><td>AnalogOffset, AnalogOffset_RBV</td>
+<td>longout, longin</td>
+<td>DanteAnalogOffset</td>
+<td>The analog offset applied to the input signal, 0 to 255.
+This offset must be adjusted to keep the input signal within the range of the ADC.
+This should be adjusted using the ADC Trace plot with a long sampling to see the range of the input
+signal through a reset event.</td>
+</tr>
+<tr class="row-odd"><td>ResetThreshold, ResetThreshold_RBV</td>
+<td>longout, longin</td>
+<td>DanteResetThreshold</td>
+<td>The reset threshold in ADC units per N 8 ns sample intervals. The Dante detects a reset the signal changes by more than this amount.
+The standard firmware uses N=6 and this ResetThreshold value.
+The high-rate firmware uses N=1 and fixes ResetThreshold=256, so this parameter has no effect.</td>
+</tr>
+<tr class="row-even"><td>ResetRecoveryTime, ResetRecoveryTime_RBV</td>
+<td>ao, ai</td>
+<td>DanteResetRecoveryTime</td>
+<td>The time in microseconds to wait after a reset event.</td>
+</tr>
+<tr class="row-odd"><td>Gain, Gain_RBV</td>
+<td>ao, ai</td>
+<td>DanteGain</td>
+<td>The gain which controls the number of ADC units per MCA bin.  Gains of 1.0-4.0 are typical.</td>
+</tr>
+<tr class="row-even"><td>FastThreshold, FastThreshold_RBV</td>
+<td>ao, ai</td>
+<td>DanteFastFilterThreshold</td>
+<td>The fast filter threshold in keV.</td>
+</tr>
+<tr class="row-odd"><td>FastPeakingTime, FastPeakingTime_RBV</td>
+<td>ao, ai</td>
+<td>DanteEdgePeakingTime</td>
+<td>The peaking time of the fast filter in microseconds.</td>
+</tr>
+<tr class="row-even"><td>FastFlatTopTime, FastFlatTopTime_RBV</td>
+<td>ao, ai</td>
+<td>DanteEdgeFlatTop</td>
+<td>The flat top time of the fast filter in microseconds.</td>
+</tr>
+<tr class="row-odd"><td>EnergyThreshold, EnergyThreshold_RBV</td>
+<td>ao, ai</td>
+<td>DanteEnergyFilterThreshold</td>
+<td>The energy filter threshold in keV.</td>
+</tr>
+<tr class="row-even"><td>PeakingTime, PeakingTime_RBV</td>
+<td>ao, ai</td>
+<td>DantePeakingTime</td>
+<td>The peaking time of the slow filter in microseconds.</td>
+</tr>
+<tr class="row-odd"><td>MaxPeakingTime, MaxPeakingTime_RBV</td>
+<td>ao, ai</td>
+<td>DanteMaxPeakingTime</td>
+<td>The maximum peaking time of the slow filter in microseconds. Used only with the high-rate firmware.
+Must be set to 0 when using the standard firmware.</td>
+</tr>
+<tr class="row-even"><td>FlatTopTime, FlatTopTime_RBV</td>
+<td>ao, ai</td>
+<td>DanteFlatTop</td>
+<td>The flat top time of the slow filter in microseconds.</td>
+</tr>
+<tr class="row-odd"><td>BaselineThreshold, BaselineThreshold_RBV</td>
+<td>ao, ai</td>
+<td>DanteEnergyBaselineThreshold</td>
+<td>The baseline filter threshold in keV.</td>
+</tr>
+<tr class="row-even"><td>MaxRiseTime, MaxRiseTime_RBV</td>
+<td>ao, ai</td>
+<td>DanteMaxRiseTime</td>
+<td>The maximum rise time in usec. Pulses with a longer rise time will be pileup rejected.</td>
+</tr>
+<tr class="row-odd"><td>ZeroPeakFreq, ZeroPeakFreq_RBV</td>
+<td>ao, ai</td>
+<td>DanteZeroPeakFreq</td>
+<td>The frequency of the zero-energy peak in Hz.</td>
+</tr>
+<tr class="row-even"><td>BaselineSamples, BaselineSamples_RBV</td>
+<td>longout, longin</td>
+<td>DanteBaselineSamples</td>
+<td>The number of baseline samples.  Typical value is 64.</td>
+</tr>
+<tr class="row-odd"><td>TimeConstant, TimeConstant_RBV</td>
+<td>ao, ai</td>
+<td>DanteTimeConstant</td>
+<td>The time constant. Used for digital deconvolution in the case of continuous reset signals.</td>
+</tr>
+<tr class="row-even"><td>TailCoefficient, TailCoefficient_RBV</td>
+<td>ao, ai</td>
+<td>DanteTailCoefficient</td>
+<td>The tail coefficient. Not currently used.</td>
+</tr>
+<tr class="row-odd"><td>BaseOffset, BaseOffset_RBV</td>
+<td>longout, longin</td>
+<td>DanteBaseOffset</td>
+<td>The base offset. Used for digital deconvolution in the case of continuous reset signals.</td>
+</tr>
+<tr class="row-even"><td>OverflowRecoveryTime, OverflowRecoveryTime_RBV</td>
+<td>ao, ai</td>
+<td>DanteOverflowRecoveryTime</td>
+<td>The overflow recovery time. Not currently used.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="run-time-statistics">
+<h2><a class="toc-backref" href="#id6">Run-time statistics</a><a class="headerlink" href="#run-time-statistics" title="Permalink to this headline">¶</a></h2>
+<p>These are the records for run-time statistics.</p>
+<p>These parameters are specific to a single board, and are contained in DanteN.template.</p>
+<table border="1" class="colwidths-auto table-bordered table-striped table-hover docutils">
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">EPICS record names</th>
+<th class="head">Record types</th>
+<th class="head">drvInfo string</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>InputCountRate</td>
+<td>ai</td>
+<td>DanteInputCountRate</td>
+<td>The input count rate in kHz.</td>
+</tr>
+<tr class="row-odd"><td>OutputCountRate</td>
+<td>ai</td>
+<td>DanteOutputCountRate</td>
+<td>The output count rate in kHz.</td>
+</tr>
+<tr class="row-even"><td>Triggers</td>
+<td>longin</td>
+<td>DanteTriggers</td>
+<td>The number of triggers received.</td>
+</tr>
+<tr class="row-odd"><td>Events</td>
+<td>longin</td>
+<td>DanteEvents</td>
+<td>The number of events received.</td>
+</tr>
+<tr class="row-even"><td>FastDeadTime</td>
+<td>longin</td>
+<td>DanteEdgeDTime</td>
+<td>The fast deadtime in clock ticks.</td>
+</tr>
+<tr class="row-odd"><td>F1DeadTime</td>
+<td>longin</td>
+<td>DanteFilt1DT</td>
+<td>The filter 1 deadtime in clock ticks.</td>
+</tr>
+<tr class="row-even"><td>ZeroCounts</td>
+<td>longin</td>
+<td>DanteZeroCounts</td>
+<td>The number of zero count events.</td>
+</tr>
+<tr class="row-odd"><td>BaselineCount</td>
+<td>longin</td>
+<td>DanteBaselinesValue</td>
+<td>The number of baseline events.</td>
+</tr>
+<tr class="row-even"><td>PileUp</td>
+<td>longin</td>
+<td>DantePUPValue</td>
+<td>The number of pileup events.</td>
+</tr>
+<tr class="row-odd"><td>F1PileUp</td>
+<td>longin</td>
+<td>DantePUPF1Value</td>
+<td>The number of filter 1 pileup events.</td>
+</tr>
+<tr class="row-even"><td>NotF1PileUp</td>
+<td>longin</td>
+<td>DantePUPNotF1Value</td>
+<td>The number of not filter 1 pileup events.</td>
+</tr>
+<tr class="row-odd"><td>ResetCounts</td>
+<td>longin</td>
+<td>DanteResetCounterValue</td>
+<td>The number of reset events.</td>
+</tr>
+<tr class="row-even"><td>LastTimeStamp</td>
+<td>ai</td>
+<td>DanteLastTimeStamp</td>
+<td>The last timestamp time in clock ticks.</td>
+</tr>
+</tbody>
+</table>
+<p>The following is the main MEDM screen dante.adl. This screen is used with the 1-channel Dante.  Multi-board Dante systems will
+use a different screen that has not yet been created.</p>
+<div class="figure align-center">
+<img alt="../_images/dante1.png" src="../_images/dante1.png" />
+</div>
+</div>
+<div class="section" id="mca-mode">
+<h2><a class="toc-backref" href="#id7">MCA mode</a><a class="headerlink" href="#mca-mode" title="Permalink to this headline">¶</a></h2>
+<p>The MCA mode collects a single MCA record at a time.  It is compatible with the MCA record, and is the same
+as MCA operation on many other EPICS MCAs, e.g. Canberra AIM, Amptek, XIA (Saturn, Mercury, xMAP, FalconX), SIS38XX, and others.</p>
+<p>It only supports counting for a preset real time, or counting indefinitely (PresetReal=0).
+It does not support PresetLive or PresetCounts which some other MCAs do.</p>
+<p>The following is the MEDM screen mca.adl displaying the MCA spectrum as it is acquiring.</p>
+<div class="figure align-center">
+<img alt="../_images/dante_mca1.png" src="../_images/dante_mca1.png" />
+</div>
+<p>The following is the IDL MCA Display program showing the MCA spectrum as it is acquiring. This GUI allows defining ROIs
+graphically, fitting peaks and background, and many other features.</p>
+<div class="figure align-center">
+<img alt="../_images/dante_idl_mca1.png" src="../_images/dante_idl_mca1.png" />
+</div>
+</div>
+<div class="section" id="mca-mapping-mode">
+<h2><a class="toc-backref" href="#id8">MCA mapping mode</a><a class="headerlink" href="#mca-mapping-mode" title="Permalink to this headline">¶</a></h2>
+<p>These are the records for MCA Mapping mode.</p>
+<table border="1" class="colwidths-auto table-bordered table-striped table-hover docutils">
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">EPICS record names</th>
+<th class="head">Record types</th>
+<th class="head">drvInfo string</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>CurrentPixel</td>
+<td>longin</td>
+<td>DanteCurrentPixel</td>
+<td>In MCA Mapping mode this is the current pixel number.  In List mode it is the total number of x-ray events received so far.</td>
+</tr>
+<tr class="row-odd"><td>MappingPoints, MappingPoints_RBV</td>
+<td>longout, longin</td>
+<td>DanteMappingPoints</td>
+<td>The number of spectra to collect in MCA mapping mode.</td>
+</tr>
+</tbody>
+</table>
+<p>In MCA mapping mode the GatingMode can be “Free running”, “Trig rising”, “Trig falling”, or “Trig both”.
+In free-running mode the Dante will begin the next spectrum when the PresetReal time has elapsed.
+In triggered mode the Dante will begin the next spectrum when the when a trigger occurs
+or when the PresetReal time has elapsed, whichever comes first.
+To advance only on trigger events set the PresetReal time to a value larger than the maximum time between triggers.</p>
+<p>The MCA spectra are copied into NDArrays of dimensions [NumMCAChannels, NumBoards]. For a 1-channel Dante
+NumBoards is 1.  The run-time statistics for each spectrum are copied into NDAttributes attached to each
+NDArray. The attribute names contain the board number, for example “RealTime_0”.</p>
+<p>The NDArrays can be used by any of the standard areaDetector plugins.  For example, they can be streamed
+to HDF5, netCDF, or TIFF files.</p>
+<p>The following is the MEDM screen NDFileHDF5.adl when the Dante is saving MCA mapping data to an HDF5 file.</p>
+<div class="figure align-center">
+<img alt="../_images/dante_mapping_hdf51.png" src="../_images/dante_mapping_hdf51.png" />
+</div>
+</div>
+<div class="section" id="list-mode">
+<h2><a class="toc-backref" href="#id9">List mode</a><a class="headerlink" href="#list-mode" title="Permalink to this headline">¶</a></h2>
+<p>These are the records for list mode.</p>
+<table border="1" class="colwidths-auto table-bordered table-striped table-hover docutils">
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">EPICS record names</th>
+<th class="head">Record types</th>
+<th class="head">drvInfo string</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>CurrentPixel</td>
+<td>longin</td>
+<td>DanteCurrentPixel</td>
+<td>In List mode this is the total number of x-ray events received so far.</td>
+</tr>
+<tr class="row-odd"><td>ListBufferSize, ListBufferSize_RBV</td>
+<td>longout, longin</td>
+<td>DanteListBufferSize</td>
+<td>The number of x-ray events per buffer in list mode.
+Once this number of events has been received the events read from the Dante
+stored in NDArrays, and callbacks are done to any registered plugins.</td>
+</tr>
+</tbody>
+</table>
+<p>List mode events are 64-bit unsigned integers.</p>
+<ul class="simple">
+<li>Bits 0 to 15 are the x-ray energy, i.e. ADC value.</li>
+<li>Bits 16 to 17 are not used.</li>
+<li>Bits 18 to 61 are the timestamp in 8 ns units.</li>
+<li>Bits 62 and 63 are not used.</li>
+</ul>
+<p>In list mode the x-ray events are copied into NDArrays.
+Because the EPICS asyn and areaDetector modules do not yet support 64-bit integers the data type of
+the NDArrays is set to NDUInt8, and the NDArrayDimensions are [ListBufferSize*8, NumBoards].
+For a 1-channel Dante NumBoards is 1.</p>
+<p>The run-time statistics for ListBufferSize events are copied into NDAttributes attached to each
+NDArray. The attribute names contain the board number, for example “RealTime_0”.
+Note that these statistics are cummulative for the entire acquisition, not just since the
+last time the event buffer was read.
+By making ListBufferSize smaller one obtains a more frequent sampling of these statistics.</p>
+<p>These statistics also update the run-time statistics records described above, so there is feedback
+while the list mode acquisition is in progress.</p>
+<p>The first NumMCAChannels events are copied to the buffer for the MCA record for each board.
+In this case the MCA record will not contain an x-ray spectrum, but rather will contain the x-ray
+energy in ADC units on the vertical axis and the event number on the horizontal axis.</p>
+<p>The NDArrays can be used by any of the standard areaDetector plugins.  For example, they can be streamed
+to HDF5, netCDF, or TIFF files.</p>
+<p>Note that the datatype in the files is unsigned 8-bit integers.  Applications that read the arrays must
+cast them to unsigned 64-bit arrays before operating on them.
+In the future support for 64-bit integers will be added to asyn and areaDetector, and the NDArrays will
+have the correct new NDUInt64 datatype.</p>
+<p>The following is an IDL procedure to read the List mode data from a netCDF file into two arrays, “energy” and “time”:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>pro read_dante_list_data, filename, energy, time
+   raw = read_nd_netcdf(filename)
+   data = ulong64(raw, 0, n_elements(raw)/8)
+   energy = uint(data and &#39;ffff&#39;x)
+   time = double(ishft((data and &#39;3ffffffffffc0000&#39;x), -18))*8e-9
+end
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">read_nd_netcdf</span></code> is a function provide in the <a class="reference external" href="https://areadetector.github.io">areaDetector</a> package that reads a netCDF file written by the areaDetector
+NDFileNetCDF plugin.
+The following is a plot of the energy events for the first 1 second of that data, using this IDL command:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>IDL&gt; p = plot(time, energy, xrange=[0,1], yrange=[0,20000], linestyle=&#39;none&#39;, symbol=&#39;plus&#39;)
+</pre></div>
+</div>
+<div class="figure align-center">
+<img alt="../_images/dante_idl_list_plot1.png" src="../_images/dante_idl_list_plot1.png" />
+</div>
+</div>
+<div class="section" id="adc-trace-waveforms">
+<h2><a class="toc-backref" href="#id10">ADC trace waveforms</a><a class="headerlink" href="#adc-trace-waveforms" title="Permalink to this headline">¶</a></h2>
+<p>The Dante can collect ADC trace waveforms, which is effectively a digital oscilloscope of the pre-amp input signal.
+This very useful for setting the AnalogOffset record, and for diagnosing issues with the input.</p>
+<p>These are the records to control ADC traces. All of the records except TraceData affect all boards and are in dante.template.
+TraceData is specific to each board and is in danteN.template.</p>
+<table border="1" class="colwidths-auto table-bordered table-striped table-hover docutils">
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">EPICS record names</th>
+<th class="head">Record types</th>
+<th class="head">drvInfo string</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>TraceTimeArray</td>
+<td>waveform</td>
+<td>DanteTraceTimeArray</td>
+<td>Waveform record containing the time values for each point in TraceData. 64-bit float data type.</td>
+</tr>
+<tr class="row-odd"><td>TraceTime, TraceTime_RBV</td>
+<td>ao, ai</td>
+<td>DanteTraceTime</td>
+<td>Time per sample of the ADC trace data in microseconds. Allowed range is 0.016 to 0.512.</td>
+</tr>
+<tr class="row-even"><td>TraceLength, TraceLength_RBV</td>
+<td>longout, longin</td>
+<td>DanteTraceLength</td>
+<td>The number of samples to read in the ADC trace.  This must be a multiple of 16384, and will be limited by the
+NELM field of the TraceData and TraceTimeArray waveform records.</td>
+</tr>
+<tr class="row-odd"><td>TraceTriggerLevel, TraceTriggerLevel_RBV</td>
+<td>longout, longin</td>
+<td>DanteTraceTriggerLevel</td>
+<td>The trigger level in ADC units (0 to 65535).</td>
+</tr>
+<tr class="row-even"><td>TraceTriggerRising, TraceTriggerRising_RBV</td>
+<td>bo, bi</td>
+<td>DanteTraceTriggerRising</td>
+<td>Trigger the ADC trace as it rises through TraceTriggerLevel. Choices are “No” (0) and “Yes” (1).</td>
+</tr>
+<tr class="row-odd"><td>TraceTriggerFalling, TraceTriggerFalling_RBV</td>
+<td>bo, bi</td>
+<td>DanteTraceTriggerFalling</td>
+<td>Trigger the ADC trace as it fals through TraceTriggerLevel. Choices are “No” (0) and “Yes” (1).</td>
+</tr>
+<tr class="row-even"><td>TraceTriggerInstant, TraceTriggerInstant_RBV</td>
+<td>bo, bi</td>
+<td>DanteTraceTriggerInstant</td>
+<td>Trigger the ADC trace even if a rising or falling trigger is not detected. Choices are “No” (0) and “Yes” (1).</td>
+</tr>
+<tr class="row-odd"><td>TraceTriggerWait, TraceTriggerWait_RBV</td>
+<td>ao, ai</td>
+<td>DanteTraceTriggerWait</td>
+<td>The delay time after the trigger condition is satisfied before beginning the ADC trace.</td>
+</tr>
+<tr class="row-even"><td>TraceData</td>
+<td>waveform</td>
+<td>DanteTraceData</td>
+<td>Waveform record containing the ADC trace data. 32-bit integer data type.</td>
+</tr>
+</tbody>
+</table>
+<p>The following is the MEDM screen danteTrace.adl displaying the ADC trace. One reset is visible on this trace.
+This happens to be from a Vortex SDD detector with a pre-amp ramp range that is slightly larger than this
+Dante was factory-configured to use.  Thus the signal goes above and below the range of the ADC around the
+reset.  The total pre-amp voltage range must be specified when ordering the Dante so that the signal will
+stay in the range of the ADC.</p>
+<div class="figure align-center">
+<img alt="../_images/dante_trace1.png" src="../_images/dante_trace1.png" />
+</div>
+</div>
+<div class="section" id="ioc-startup-script">
+<h2><a class="toc-backref" href="#id11">IOC startup script</a><a class="headerlink" href="#ioc-startup-script" title="Permalink to this headline">¶</a></h2>
+<p>The command to configure an ADSpinnaker camera in the startup script is:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>DanteConfig(portName, ipAddress, numDetectors, maxMemory)
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">portName</span></code> is the name for the Dante port driver</p>
+<p><code class="docutils literal notranslate"><span class="pre">ipAddress</span></code> is the IP address of the Dante</p>
+<p><code class="docutils literal notranslate"><span class="pre">numDetectors</span></code> is the number of boards in the Dante system</p>
+<p><code class="docutils literal notranslate"><span class="pre">maxMemory</span></code> is the maximum amount of memory the NDArrayPool is allowed to allocate.  0 means unlimited.</p>
+</div>
+<div class="section" id="known-problems">
+<h2><a class="toc-backref" href="#id12">Known problems</a><a class="headerlink" href="#known-problems" title="Permalink to this headline">¶</a></h2>
+<p>The known problems and suggestions for fixes with the Dante are located here:</p>
+<p><a class="reference external" href="https://onedrive.live.com/view.aspx?resid=B1EF6D9CFBC508F4!621&amp;ithint=file%2cdocx&amp;authkey=!AFZfJ0wJfFbDCAI">https://onedrive.live.com/view.aspx?resid=B1EF6D9CFBC508F4!621&amp;ithint=file%2cdocx&amp;authkey=!AFZfJ0wJfFbDCAI</a></p>
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2019, Mark Rivers.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>
