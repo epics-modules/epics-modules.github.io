@@ -19,7 +19,7 @@ sphinx:
 
 .PHONY: install
 install:
-	cp -r _build/html master/
+	cp -r _build/html/* master/
 
 
 .PHONY: clean
