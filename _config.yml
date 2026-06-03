@@ -1,0 +1,6 @@
+remote_theme: BCDA-APS/bcda-pages-style
+
+title: EPICS Modules
+description: Community-maintained EPICS support modules
+
+url: "https://epics-modules.github.io"

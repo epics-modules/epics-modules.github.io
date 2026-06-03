@@ -1,3 +1,6 @@
-_build
-_docs
-master/html
+_site/
+.jekyll-cache/
+.jekyll-metadata
+.bundle/
+vendor/
+Gemfile.lock
