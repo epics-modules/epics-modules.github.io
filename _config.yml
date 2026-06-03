@@ -4,3 +4,91 @@ title: EPICS Modules
 description: Community-maintained EPICS support modules
 
 url: "https://epics-modules.github.io"
+
+nav_external_links_new_tab: true
+
+nav_external_links:
+  - title: alive
+    url: https://epics-modules.github.io/alive/
+  - title: asyn
+    url: https://epics-modules.github.io/asyn/
+  - title: autosave
+    url: https://epics-modules.github.io/autosave/
+  - title: busy
+    url: https://epics-modules.github.io/busy/
+  - title: calc
+    url: https://epics-modules.github.io/calc/
+  - title: camac
+    url: https://epics-modules.github.io/camac/
+  - title: caputRecorder
+    url: https://epics-modules.github.io/caputRecorder/
+  - title: dac128V
+    url: https://epics-modules.github.io/dac128V/
+  - title: Dante
+    url: https://epics-modules.github.io/Dante/
+  - title: delaygen
+    url: https://epics-modules.github.io/delaygen/
+  - title: devlib2
+    url: https://epics-modules.github.io/devlib2/
+  - title: dxp
+    url: https://epics-modules.github.io/dxp/
+  - title: dxpSITORO
+    url: https://epics-modules.github.io/dxpSITORO/
+  - title: ecmc
+    url: https://epics-modules.github.io/ecmc/
+  - title: ip
+    url: https://epics-modules.github.io/ip/
+  - title: ip330
+    url: https://epics-modules.github.io/ip330/
+  - title: ipUnidig
+    url: https://epics-modules.github.io/ipUnidig/
+  - title: ketek
+    url: https://epics-modules.github.io/ketek/
+  - title: LabJack
+    url: https://epics-modules.github.io/LabJack/
+  - title: love
+    url: https://epics-modules.github.io/love/
+  - title: lua
+    url: https://epics-modules.github.io/lua/
+  - title: mca
+    url: https://epics-modules.github.io/mca/
+  - title: MCoreUtils
+    url: https://epics-modules.github.io/MCoreUtils/
+  - title: measComp
+    url: https://epics-modules.github.io/measComp/
+  - title: modbus
+    url: https://epics-modules.github.io/modbus/
+  - title: motor
+    url: https://epics-modules.github.io/motor/
+  - title: mrfioc2
+    url: https://epics-modules.github.io/mrfioc2/
+  - title: optics
+    url: https://epics-modules.github.io/optics/
+  - title: pyDevSup
+    url: https://epics-modules.github.io/pyDevSup/
+  - title: quadEM
+    url: https://epics-modules.github.io/quadEM/
+  - title: scaler
+    url: https://epics-modules.github.io/scaler/
+  - title: sequencer
+    url: https://epics-modules.github.io/sequencer/
+  - title: softGlue
+    url: https://epics-modules.github.io/softGlue/
+  - title: softGlueZynq
+    url: https://epics-modules.github.io/softGlueZynq/
+  - title: sscan
+    url: https://epics-modules.github.io/sscan/
+  - title: std
+    url: https://epics-modules.github.io/std/
+  - title: urRobot
+    url: https://epics-modules.github.io/urRobot/
+  - title: vac
+    url: https://epics-modules.github.io/vac/
+  - title: vme
+    url: https://epics-modules.github.io/vme/
+  - title: xspress3
+    url: https://epics-modules.github.io/xspress3/
+  - title: xxx
+    url: https://epics-modules.github.io/xxx/
+  - title: Yokogawa_DAS
+    url: https://epics-modules.github.io/Yokogawa_DAS/
