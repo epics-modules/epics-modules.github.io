@@ -5,7 +5,7 @@ description: Community-maintained EPICS support modules
 
 url: "https://epics-modules.github.io"
 
-nav_external_links_new_tab: true
+nav_external_links_new_tab: false
 
 nav_external_links:
   - title: alive
