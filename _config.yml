@@ -8,6 +8,8 @@ url: "https://epics-modules.github.io"
 nav_external_links_new_tab: false
 
 nav_external_links:
+  - title: synApps
+    url: https://epics-synapps.github.io/
   - title: alive
     url: https://epics-modules.github.io/alive/
   - title: asyn
