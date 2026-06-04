@@ -9,7 +9,7 @@ nav_external_links_new_tab: false
 
 nav_external_links:
   - title: synApps
-    url: https://epics-synapps.github.io/
+    url: https://epics-synapps.github.io/support/
   - title: alive
     url: https://epics-modules.github.io/alive/
   - title: asyn
