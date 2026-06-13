@@ -173,11 +173,14 @@ script.
 
 ## Contributing
 
-Contributions are welcome. To contribute to a module:
+Contributions are welcome. To contribute to an existing module:
 
 1. Open an issue on the module's GitHub repository to discuss the change.
 2. Fork the repository and make your changes on a branch.
 3. Submit a pull request.
+
+To add a new module to the organization, see
+[Contributing a Module](contributing).
 
 For questions and discussion, see the
 [EPICS Tech-Talk mailing list](https://epics.anl.gov/tech-talk/) and the
